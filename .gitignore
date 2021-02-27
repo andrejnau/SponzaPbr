@@ -1,0 +1,8 @@
+/build*
+/linux_build*
+*.*~
+*.*.user*
+*.log
+/.vs
+local_model
+install
