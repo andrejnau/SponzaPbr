@@ -22,9 +22,7 @@
 #include "BRDFGen.h"
 #include "Equirectangular2Cubemap.h"
 
-#ifdef RAYTRACING_SUPPORT
 #include "RayTracingAOPass.h"
-#endif
 
 #include <Camera/Camera.h>
 #include <glm/glm.hpp>
@@ -79,9 +77,7 @@ private:
     ShadowPass m_shadow_pass;
     SSAOPass m_ssao_pass;
     std::shared_ptr<Resource>* m_rtao = nullptr;
-#ifdef RAYTRACING_SUPPORT
     std::unique_ptr<RayTracingAOPass> m_ray_tracing_ao_pass;
-#endif
     BRDFGen m_brdf;
     Equirectangular2Cubemap m_equirectangular2cubemap;
     IBLCompute m_ibl_compute;

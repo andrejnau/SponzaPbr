@@ -87,20 +87,18 @@ set(compute_shaders
     ${shaders_path}/Skinning_CS.hlsl
 )
 
-if (RAYTRACING_SUPPORT)
-    set(headers
-        ${headers}
-        ${include_path}/RayTracingAOPass.h
-    )
-    set(sources
-        ${sources}
-        ${source_path}/RayTracingAOPass.cpp
-    )
-    set(lib_shaders
-        ${lib_shaders}
-        ${shaders_path}/RayTracingAO.hlsl
-    )
-endif()
+set(headers
+    ${headers}
+    ${include_path}/RayTracingAOPass.h
+)
+set(sources
+    ${sources}
+    ${source_path}/RayTracingAOPass.cpp
+)
+set(lib_shaders
+    ${lib_shaders}
+    ${shaders_path}/RayTracingAO.hlsl
+)
 
 set_property(SOURCE ${pixel_shaders} PROPERTY VS_SHADER_ENTRYPOINT main)
 set_property(SOURCE ${pixel_shaders} PROPERTY VS_SHADER_TYPE Pixel)
@@ -129,7 +127,7 @@ set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-s
 
 set(shaders_files ${pixel_shaders} ${vertex_shaders} ${geometry_shaders} ${compute_shaders} ${lib_shaders})
 
-include(shader_parser)
+include(${project_root}/3rdparty/FlyCube/cmake/shader_parser.cmake)
 
 source_group("Shader Files" FILES ${shaders_files} ${shader_headers})
 source_group("Shader Ref Files" FILES ${shaders_ref})

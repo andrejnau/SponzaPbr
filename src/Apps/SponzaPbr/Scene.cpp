@@ -10,8 +10,8 @@ Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height
     , m_width(width)
     , m_height(height)
     , m_upload_command_list(m_device->CreateRenderCommandList())
-    , m_model_square(*m_device, *m_upload_command_list, "model/square.obj")
-    , m_model_cube(*m_device, *m_upload_command_list, "model/cube.obj", ~aiProcess_FlipWindingOrder)
+    , m_model_square(*m_device, *m_upload_command_list, ASSETS_PATH"model/square.obj")
+    , m_model_cube(*m_device, *m_upload_command_list, ASSETS_PATH"model/cube.obj", ~aiProcess_FlipWindingOrder)
     , m_skinning_pass(*m_device, { m_scene_list })
     , m_geometry_pass(*m_device, { m_scene_list, m_camera }, width, height)
     , m_shadow_pass(*m_device, { m_scene_list, m_camera, m_light_pos })
@@ -25,18 +25,18 @@ Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height
     , m_imgui_pass(*m_device, *m_upload_command_list, { m_render_target_view, *this, m_settings }, width, height, window)
 {
 #if !defined(_DEBUG) && 1
-    m_scene_list.emplace_back(*m_device, *m_upload_command_list, "model/sponza_pbr/sponza.obj");
+    m_scene_list.emplace_back(*m_device, *m_upload_command_list, ASSETS_PATH"model/sponza_pbr/sponza.obj");
     m_scene_list.back().matrix = glm::scale(glm::vec3(0.01f));
 #endif
 
 #if 1
-    m_scene_list.emplace_back(*m_device, *m_upload_command_list, "model/export3dcoat/export3dcoat.obj");
+    m_scene_list.emplace_back(*m_device, *m_upload_command_list, ASSETS_PATH"model/export3dcoat/export3dcoat.obj");
     m_scene_list.back().matrix = glm::scale(glm::vec3(0.07f)) * glm::translate(glm::vec3(0.0f, 35.0f, 0.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
     m_scene_list.back().ibl_request = true;
 #endif
 
 #if 1
-    m_scene_list.emplace_back(*m_device, *m_upload_command_list, "model/Mannequin_Animation/source/Mannequin_Animation.FBX");
+    m_scene_list.emplace_back(*m_device, *m_upload_command_list, ASSETS_PATH"model/Mannequin_Animation/source/Mannequin_Animation.FBX");
     m_scene_list.back().matrix = glm::scale(glm::vec3(0.07f)) * glm::translate(glm::vec3(75.0f, 0.0f, 0.0f)) * glm::rotate(glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 #endif
 
@@ -53,7 +53,7 @@ Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height
     float x = 300;
     for (const auto& test : hdr_tests)
     {
-        m_scene_list.emplace_back(*m_device, *m_upload_command_list, "model/pbr_test/" + test.first + "/sphere.obj");
+        m_scene_list.emplace_back(*m_device, *m_upload_command_list, ASSETS_PATH"model/pbr_test/" + test.first + "/sphere.obj");
         m_scene_list.back().matrix = glm::scale(glm::vec3(0.01f)) * glm::translate(glm::vec3(x, 500, 0.0f));
         m_scene_list.back().ibl_request = test.second;
         if (!test.second)
@@ -70,7 +70,7 @@ Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height
 
     CreateRT();
 
-    m_equirectangular_environment = CreateTexture(*m_device, *m_upload_command_list, GetAssetFullPath("model/newport_loft.dds"));
+    m_equirectangular_environment = CreateTexture(*m_device, *m_upload_command_list, ASSETS_PATH"model/newport_loft.dds");
 
     size_t layer = 0;
     {
@@ -90,23 +90,19 @@ Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height
         m_irradiance_conversion.emplace_back(new IrradianceConversion(*m_device, { m_model_cube, model.ibl_rtv, irradince, prefilter }));
     }
 
-#ifdef RAYTRACING_SUPPORT
     if (m_device->IsDxrSupported())
     {
         m_settings.Set("use_rtao", true);
         m_ray_tracing_ao_pass.reset(new RayTracingAOPass(*m_device, *m_upload_command_list, { m_geometry_pass.output, m_scene_list, m_model_square, m_camera }, width, height));
         m_rtao = &m_ray_tracing_ao_pass->output.ao;
     }
-#endif
 
     m_passes.push_back({ "Skinning Pass", m_skinning_pass });
     m_passes.push_back({ "Geometry Pass", m_geometry_pass });
     m_passes.push_back({ "Shadow Pass", m_shadow_pass });
     m_passes.push_back({ "SSAO Pass", m_ssao_pass });
-#ifdef RAYTRACING_SUPPORT
     if (m_ray_tracing_ao_pass)
         m_passes.push_back({ "DXR AO Pass", *m_ray_tracing_ao_pass });
-#endif
 
     m_passes.push_back({ "brdf Pass", m_brdf });
     m_passes.push_back({ "equirectangular to cubemap Pass", m_equirectangular2cubemap });
