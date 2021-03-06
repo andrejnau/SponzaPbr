@@ -5,6 +5,8 @@
 
 #include <Geometry/IABuffer.h>
 #include <Utilities/FormatHelper.h>
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
 
 ImGuiPass::ImGuiPass(RenderDevice& device, RenderCommandList& command_list, const Input& input, int width, int height, GLFWwindow* window)
     : m_device(device)
@@ -18,6 +20,10 @@ ImGuiPass::ImGuiPass(RenderDevice& device, RenderCommandList& command_list, cons
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)width, (float)height);
+    auto dpi = GetDpiForWindow(glfwGetWin32Window(window));
+    float scale = dpi / 96.0;
+    io.FontGlobalScale = scale;
+    ImGui::GetStyle().ScaleAllSizes(scale);
 
     InitKey();
     CreateFontsTexture(command_list);
