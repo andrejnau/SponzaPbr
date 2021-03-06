@@ -132,7 +132,7 @@ SponzaSettings::SponzaSettings()
     add_checkbox("use_ssao", true);
     add_checkbox("use_rtao", false);
     add_checkbox("use_ao_blur", true);
-    add_slider_int("rtao_num_rays", 32, 1, 128);
+    add_slider_int("rtao_num_rays", 6, 1, 128);
     add_slider("ao_radius", 0.05, 0.01, 5, false);
     add_checkbox("use_alpha_test", true);
     add_checkbox("use_shadow", true);
