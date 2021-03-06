@@ -1,6 +1,8 @@
 ## SponzaPbr
 
-* Scene Features
+[FlyCube](https://github.com/andrejnau/FlyCube) is used as a rendering backend
+
+* Features
   * Deferred rendering
   * Physically based rendering
   * Image based lighting

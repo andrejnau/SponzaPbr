@@ -28,13 +28,13 @@ RayTracingAOPass::RayTracingAOPass(RenderDevice& device, RenderCommandList& comm
             ViewDesc view_desc = {};
             view_desc.bindless = true;
             view_desc.dimension = ResourceDimension::kTexture2D;
-            view_desc.view_type = ViewType::kShaderResource;
+            view_desc.view_type = ViewType::kTexture;
             m_views.emplace_back(m_device.CreateView(material.texture.opacity, view_desc));
             info.x = m_views.back()->GetDescriptorId();
 
             view_desc.bindless = true;
             view_desc.dimension = ResourceDimension::kBuffer;
-            view_desc.view_type = ViewType::kShaderResource;
+            view_desc.view_type = ViewType::kStructuredBuffer;
             view_desc.offset = sizeof(uint32_t) * range.start_index_location;
             view_desc.stride = sizeof(uint32_t);
             m_views.emplace_back(m_device.CreateView(model.ia.indices.GetBuffer(), view_desc));
@@ -42,7 +42,7 @@ RayTracingAOPass::RayTracingAOPass(RenderDevice& device, RenderCommandList& comm
 
             view_desc.bindless = true;
             view_desc.dimension = ResourceDimension::kBuffer;
-            view_desc.view_type = ViewType::kShaderResource;
+            view_desc.view_type = ViewType::kStructuredBuffer;
             view_desc.offset = sizeof(glm::vec2) * range.base_vertex_location;
             view_desc.stride = sizeof(glm::vec2);
             m_views.emplace_back(m_device.CreateView(model.ia.texcoords.IsDynamic() ? model.ia.texcoords.GetDynamicBuffer() : model.ia.texcoords.GetBuffer(), view_desc));
