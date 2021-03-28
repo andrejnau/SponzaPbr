@@ -4,8 +4,8 @@
 #include "SponzaSettings.h"
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/BackgroundPS.h>
-#include <ProgramRef/BackgroundVS.h>
+#include <ProgramRef/Background_PS.h>
+#include <ProgramRef/Background_VS.h>
 
 class BackgroundPass : public IPass, public IModifySponzaSettings
 {
@@ -39,5 +39,5 @@ private:
     int m_width;
     int m_height;
     std::shared_ptr<Resource> m_sampler;
-    ProgramHolder<BackgroundVS, BackgroundPS> m_program;
+    ProgramHolder<Background_VS, Background_PS> m_program;
 };

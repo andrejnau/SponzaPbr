@@ -27,24 +27,24 @@ RayTracingAOPass::RayTracingAOPass(RenderDevice& device, RenderCommandList& comm
             glm::uvec4 info = {};
             ViewDesc view_desc = {};
             view_desc.bindless = true;
-            view_desc.dimension = ResourceDimension::kTexture2D;
+            view_desc.dimension = ViewDimension::kTexture2D;
             view_desc.view_type = ViewType::kTexture;
             m_views.emplace_back(m_device.CreateView(material.texture.opacity, view_desc));
             info.x = m_views.back()->GetDescriptorId();
 
             view_desc.bindless = true;
-            view_desc.dimension = ResourceDimension::kBuffer;
+            view_desc.dimension = ViewDimension::kBuffer;
             view_desc.view_type = ViewType::kStructuredBuffer;
             view_desc.offset = sizeof(uint32_t) * range.start_index_location;
-            view_desc.stride = sizeof(uint32_t);
+            view_desc.structure_stride = sizeof(uint32_t);
             m_views.emplace_back(m_device.CreateView(model.ia.indices.GetBuffer(), view_desc));
             info.y = m_views.back()->GetDescriptorId();
 
             view_desc.bindless = true;
-            view_desc.dimension = ResourceDimension::kBuffer;
+            view_desc.dimension = ViewDimension::kBuffer;
             view_desc.view_type = ViewType::kStructuredBuffer;
             view_desc.offset = sizeof(glm::vec2) * range.base_vertex_location;
-            view_desc.stride = sizeof(glm::vec2);
+            view_desc.structure_stride = sizeof(glm::vec2);
             m_views.emplace_back(m_device.CreateView(model.ia.texcoords.IsDynamic() ? model.ia.texcoords.GetDynamicBuffer() : model.ia.texcoords.GetBuffer(), view_desc));
             info.z = m_views.back()->GetDescriptorId();
 
@@ -189,7 +189,7 @@ void RayTracingAOPass::OnRender(RenderCommandList& command_list)
         for (auto& range : m_input.square.ia.ranges)
         {
             command_list.Attach(m_program_blur.ps.srv.ssaoInput, m_ao);
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
         command_list.EndRenderPass();
 

@@ -4,9 +4,9 @@
 #include <Device/Device.h>
 #include <Camera/Camera.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/ShadowPassVS.h>
-#include <ProgramRef/ShadowPassGS.h>
-#include <ProgramRef/ShadowPassPS.h>
+#include <ProgramRef/ShadowPass_VS.h>
+#include <ProgramRef/ShadowPass_GS.h>
+#include <ProgramRef/ShadowPass_PS.h>
 #include "SponzaSettings.h"
 
 class ShadowPass : public IPass, public IModifySponzaSettings
@@ -36,7 +36,7 @@ private:
     SponzaSettings m_settings;
     RenderDevice& m_device;
     Input m_input;
-    ProgramHolder<ShadowPassVS, ShadowPassGS, ShadowPassPS> m_program;
+    ProgramHolder<ShadowPass_VS, ShadowPass_GS, ShadowPass_PS> m_program;
     std::shared_ptr<Resource> m_sampler;
 };
 

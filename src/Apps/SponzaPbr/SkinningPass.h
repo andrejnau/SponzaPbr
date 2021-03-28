@@ -4,7 +4,7 @@
 #include "SponzaSettings.h"
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/SkinningCS.h>
+#include <ProgramRef/Skinning_CS.h>
 
 class SkinningPass : public IPass, public IModifySponzaSettings
 {
@@ -28,5 +28,5 @@ private:
     SponzaSettings m_settings;
     RenderDevice& m_device;
     Input m_input;
-    ProgramHolder<SkinningCS> m_program;
+    ProgramHolder<Skinning_CS> m_program;
 };

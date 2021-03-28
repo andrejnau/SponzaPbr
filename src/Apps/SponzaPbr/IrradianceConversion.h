@@ -4,9 +4,9 @@
 #include "SponzaSettings.h"
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/CubemapVS.h>
-#include <ProgramRef/IrradianceConvolutionPS.h>
-#include <ProgramRef/PrefilterPS.h>
+#include <ProgramRef/Cubemap_VS.h>
+#include <ProgramRef/IrradianceConvolution_PS.h>
+#include <ProgramRef/Prefilter_PS.h>
 
 class IrradianceConversion : public IPass, public IModifySponzaSettings
 {
@@ -45,7 +45,7 @@ private:
     RenderDevice& m_device;
     Input m_input;
     std::shared_ptr<Resource> m_sampler;
-    ProgramHolder<CubemapVS, IrradianceConvolutionPS> m_program_irradiance_convolution;
-    ProgramHolder<CubemapVS, PrefilterPS> m_program_prefilter;
+    ProgramHolder<Cubemap_VS, IrradianceConvolution_PS> m_program_irradiance_convolution;
+    ProgramHolder<Cubemap_VS, Prefilter_PS> m_program_prefilter;
     bool is = false;
 };

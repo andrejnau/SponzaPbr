@@ -5,9 +5,9 @@
 #include <Device/Device.h>
 #include <Camera/Camera.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/SSAOPassPS.h>
-#include <ProgramRef/SSAOPassVS.h>
-#include <ProgramRef/SSAOBlurPassPS.h>
+#include <ProgramRef/SSAOPass_PS.h>
+#include <ProgramRef/SSAOPass_VS.h>
+#include <ProgramRef/SSAOBlurPass_PS.h>
 
 class SSAOPass : public IPass, public IModifySponzaSettings
 {
@@ -32,7 +32,7 @@ public:
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 
 private:
-    void SetDefines(ProgramHolder<SSAOPassPS, SSAOPassVS>& program);
+    void SetDefines(ProgramHolder<SSAOPass_PS, SSAOPass_VS>& program);
     void CreateSizeDependentResources();
 
     SponzaSettings m_settings;
@@ -42,8 +42,8 @@ private:
     int m_height;
     std::shared_ptr<Resource> m_noise_texture;
     std::shared_ptr<Resource> m_depth_stencil_view;
-    ProgramHolder<SSAOPassPS, SSAOPassVS> m_program;
-    ProgramHolder<SSAOBlurPassPS, SSAOPassVS> m_program_blur;
+    ProgramHolder<SSAOPass_PS, SSAOPass_VS> m_program;
+    ProgramHolder<SSAOBlurPass_PS, SSAOPass_VS> m_program_blur;
     std::shared_ptr<Resource> m_ao;
     std::shared_ptr<Resource> m_ao_blur;
     std::shared_ptr<Resource> m_sampler;

@@ -5,8 +5,8 @@
 #include <Device/Device.h>
 #include <Camera/Camera.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/GeometryPassPS.h>
-#include <ProgramRef/GeometryPassVS.h>
+#include <ProgramRef/GeometryPass_PS.h>
+#include <ProgramRef/GeometryPass_VS.h>
 
 class GeometryPass : public IPass, public IModifySponzaSettings
 {
@@ -38,7 +38,7 @@ private:
     Input m_input;
     int m_width;
     int m_height;
-    ProgramHolder<GeometryPassPS, GeometryPassVS> m_program;
+    ProgramHolder<GeometryPass_PS, GeometryPass_VS> m_program;
 
     void CreateSizeDependentResources();
 

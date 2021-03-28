@@ -85,7 +85,7 @@ void IrradianceConversion::DrawIrradianceConvolution(RenderCommandList& command_
         command_list.Attach(m_program_irradiance_convolution.ps.srv.environmentMap, m_input.environment);
         for (auto& range : m_input.model.ia.ranges)
         {
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();
@@ -135,9 +135,9 @@ void IrradianceConversion::DrawPrefilter(RenderCommandList& command_list)
         RenderPassBeginDesc render_pass_desc = {};
         render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].texture = m_input.prefilter.res;
         render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].load_op = RenderPassLoadOp::kLoad;
-        render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].view_desc = { mip };
+        render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].view_desc = { mip, 1 };
         render_pass_desc.depth_stencil.texture = m_input.prefilter.dsv;
-        render_pass_desc.depth_stencil.view_desc = { mip };
+        render_pass_desc.depth_stencil.view_desc = { mip, 1 };
         render_pass_desc.depth_stencil.clear_depth = 1.0f;
 
         command_list.BeginRenderPass(render_pass_desc);
@@ -149,7 +149,7 @@ void IrradianceConversion::DrawPrefilter(RenderCommandList& command_list)
             command_list.Attach(m_program_prefilter.ps.srv.environmentMap, m_input.environment);
             for (auto& range : m_input.model.ia.ranges)
             {
-                command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+                command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
             }
             command_list.EndEvent();
         }

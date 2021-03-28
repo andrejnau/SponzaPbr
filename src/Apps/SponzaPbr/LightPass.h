@@ -9,8 +9,8 @@
 #include "RenderPass.h"
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/LightPassPS.h>
-#include <ProgramRef/LightPassVS.h>
+#include <ProgramRef/LightPass_PS.h>
+#include <ProgramRef/LightPass_VS.h>
 
 class LightPass : public IPass, public IModifySponzaSettings
 {
@@ -43,14 +43,14 @@ public:
 
 private:
     void CreateSizeDependentResources();
-    void SetDefines(ProgramHolder<LightPassPS, LightPassVS>& program);
+    void SetDefines(ProgramHolder<LightPass_PS, LightPass_VS>& program);
 
     SponzaSettings m_settings;
     RenderDevice& m_device;
     Input m_input;
     int m_width;
     int m_height;
-    ProgramHolder<LightPassPS, LightPassVS> m_program;
+    ProgramHolder<LightPass_PS, LightPass_VS> m_program;
     std::shared_ptr<Resource> m_depth_stencil_view;
     std::shared_ptr<Resource> m_sampler;
     std::shared_ptr<Resource> m_sampler_brdf;

@@ -6,13 +6,13 @@
 #include <Device/Device.h>
 #include <Camera/Camera.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/IBLComputeVS.h>
-#include <ProgramRef/IBLComputeGS.h>
-#include <ProgramRef/IBLComputePS.h>
-#include <ProgramRef/IBLComputePrePassPS.h>
-#include <ProgramRef/DownSampleCS.h>
-#include <ProgramRef/BackgroundPS.h>
-#include <ProgramRef/BackgroundVS.h>
+#include <ProgramRef/IBLCompute_VS.h>
+#include <ProgramRef/IBLCompute_GS.h>
+#include <ProgramRef/IBLCompute_PS.h>
+#include <ProgramRef/IBLComputePrePass_PS.h>
+#include <ProgramRef/DownSample_CS.h>
+#include <ProgramRef/Background_PS.h>
+#include <ProgramRef/Background_VS.h>
 #include "SponzaSettings.h"
 #include "ShadowPass.h"
 
@@ -47,10 +47,10 @@ private:
     SponzaSettings m_settings;
     RenderDevice& m_device;
     Input m_input;
-    ProgramHolder<IBLComputeVS, IBLComputeGS, IBLComputePS> m_program;
-    ProgramHolder<IBLComputeVS, IBLComputeGS, IBLComputePrePassPS> m_program_pre_pass;
-    ProgramHolder<BackgroundVS, BackgroundPS> m_program_backgroud;
-    ProgramHolder<DownSampleCS> m_program_downsample;
+    ProgramHolder<IBLCompute_VS, IBLCompute_GS, IBLCompute_PS> m_program;
+    ProgramHolder<IBLCompute_VS, IBLCompute_GS, IBLComputePrePass_PS> m_program_pre_pass;
+    ProgramHolder<Background_VS, Background_PS> m_program_backgroud;
+    ProgramHolder<DownSample_CS> m_program_downsample;
     std::shared_ptr<Resource> m_dsv;
     std::shared_ptr<Resource> m_sampler;
     std::shared_ptr<Resource> m_compare_sampler;

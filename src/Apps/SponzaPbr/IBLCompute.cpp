@@ -176,7 +176,7 @@ void IBLCompute::DrawPrePass(RenderCommandList& command_list, Model & ibl_model)
         {
             auto& material = model.GetMaterial(range.id);
             command_list.Attach(m_program_pre_pass.ps.srv.alphaMap, material.texture.opacity);
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();
@@ -218,6 +218,7 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
 
     RenderPassBeginDesc render_pass_desc = {};
     render_pass_desc.colors[m_program.ps.om.rtv0].texture = ibl_model.ibl_rtv;
+    render_pass_desc.colors[m_program.ps.om.rtv0].view_desc.count = 1;
     render_pass_desc.colors[m_program.ps.om.rtv0].clear_color = color;
     if (m_use_pre_pass)
     {
@@ -277,7 +278,7 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
             command_list.Attach(m_program.ps.srv.alphaMap, material.texture.opacity);
             command_list.Attach(m_program.ps.srv.LightCubeShadowMap, m_input.shadow_pass.srv);
 
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();
@@ -294,6 +295,7 @@ void IBLCompute::DrawBackgroud(RenderCommandList& command_list, Model& ibl_model
 
     RenderPassBeginDesc render_pass_desc = {};
     render_pass_desc.colors[m_program_backgroud.ps.om.rtv0].texture = ibl_model.ibl_rtv;
+    render_pass_desc.colors[m_program_backgroud.ps.om.rtv0].view_desc.count = 1;
     render_pass_desc.colors[m_program_backgroud.ps.om.rtv0].load_op = RenderPassLoadOp::kLoad;
     render_pass_desc.depth_stencil.texture = ibl_model.ibl_dsv;
     render_pass_desc.depth_stencil.depth_load_op = RenderPassLoadOp::kLoad;
@@ -333,7 +335,7 @@ void IBLCompute::DrawBackgroud(RenderCommandList& command_list, Model& ibl_model
 
         for (auto& range : m_input.model_cube.ia.ranges)
         {
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();

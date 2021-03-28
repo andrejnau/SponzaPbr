@@ -5,8 +5,8 @@
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
 #include <ProgramRef/RayTracingAO.h>
-#include <ProgramRef/SSAOPassVS.h>
-#include <ProgramRef/SSAOBlurPassPS.h>
+#include <ProgramRef/SSAOPass_VS.h>
+#include <ProgramRef/SSAOBlurPass_PS.h>
 
 class RayTracingAOPass : public IPass, public IModifySponzaSettings
 {
@@ -40,7 +40,7 @@ private:
     int m_width;
     int m_height;
     ProgramHolder<RayTracingAO> m_raytracing_program;
-    ProgramHolder<SSAOBlurPassPS, SSAOPassVS> m_program_blur;
+    ProgramHolder<SSAOBlurPass_PS, SSAOPass_VS> m_program_blur;
 
     std::vector<std::shared_ptr<Resource>> m_bottom;
     std::shared_ptr<Resource> m_top;

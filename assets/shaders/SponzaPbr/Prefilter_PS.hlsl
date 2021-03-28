@@ -81,10 +81,10 @@ float4 main(VS_OUTPUT input) : SV_TARGET
     float3 R = N;
     float3 V = R;
 
-    const uint SAMPLE_COUNT = 1024u;
+    const uint SAMPLE_COUNT = 128u;
     float3 prefilteredColor = 0;
     float totalWeight = 0.0;
-    
+
     for(uint i = 0u; i < SAMPLE_COUNT; ++i)
     {
         // generates a sample vector that's biased towards the preferred alignment direction (importance sampling).

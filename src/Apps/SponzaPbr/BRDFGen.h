@@ -4,8 +4,8 @@
 #include "SponzaSettings.h"
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/BRDFPS.h>
-#include <ProgramRef/BRDFVS.h>
+#include <ProgramRef/BRDF_PS.h>
+#include <ProgramRef/BRDF_VS.h>
 
 class BRDFGen : public IPass, public IModifySponzaSettings
 {
@@ -34,7 +34,7 @@ private:
     RenderDevice& m_device;
     Input m_input;
     std::shared_ptr<Resource> m_dsv;
-    ProgramHolder<BRDFVS, BRDFPS> m_program;
+    ProgramHolder<BRDF_VS, BRDF_PS> m_program;
     size_t m_size = 512;
     bool is = false;
 };

@@ -48,7 +48,7 @@ void BackgroundPass::OnRender(RenderCommandList& command_list)
     command_list.BeginRenderPass(render_pass_desc);
     for (auto& range : m_input.model.ia.ranges)
     {
-        command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+        command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
     }
     command_list.EndRenderPass();
 }

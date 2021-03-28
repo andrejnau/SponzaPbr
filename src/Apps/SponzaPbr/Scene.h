@@ -3,10 +3,10 @@
 #include <Geometry/Geometry.h>
 #include <string>
 
-#include <ProgramRef/GeometryPassPS.h>
-#include <ProgramRef/GeometryPassVS.h>
-#include <ProgramRef/LightPassPS.h>
-#include <ProgramRef/LightPassVS.h>
+#include <ProgramRef/GeometryPass_PS.h>
+#include <ProgramRef/GeometryPass_VS.h>
+#include <ProgramRef/LightPass_PS.h>
+#include <ProgramRef/LightPass_VS.h>
 
 #include "SkinningPass.h"
 #include "GeometryPass.h"

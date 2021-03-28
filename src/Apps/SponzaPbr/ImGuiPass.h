@@ -4,8 +4,8 @@
 #include "RenderPass.h"
 #include <Device/Device.h>
 #include <Geometry/Geometry.h>
-#include <ProgramRef/ImGuiPassPS.h>
-#include <ProgramRef/ImGuiPassVS.h>
+#include <ProgramRef/ImGuiPass_PS.h>
+#include <ProgramRef/ImGuiPass_VS.h>
 #include "ImGuiSettings.h"
 
 class ImGuiPass : public IPass
@@ -47,7 +47,7 @@ private:
     GLFWwindow* m_window;
 
     std::shared_ptr<Resource> m_font_texture_view;
-    ProgramHolder<ImGuiPassPS, ImGuiPassVS> m_program;
+    ProgramHolder<ImGuiPass_PS, ImGuiPass_VS> m_program;
     std::array<std::unique_ptr<IAVertexBuffer>, 3> m_positions_buffer;
     std::array<std::unique_ptr<IAVertexBuffer>, 3> m_texcoords_buffer;
     std::array<std::unique_ptr<IAVertexBuffer>, 3> m_colors_buffer;

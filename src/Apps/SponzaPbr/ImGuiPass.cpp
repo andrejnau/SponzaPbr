@@ -123,7 +123,7 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
             const ImDrawCmd& cmd = cmd_list->CmdBuffer[j];
             command_list.Attach(m_program.ps.srv.texture0, *(std::shared_ptr<Resource>*)cmd.TextureId);
             command_list.SetScissorRect(cmd.ClipRect.x, cmd.ClipRect.y, cmd.ClipRect.z, cmd.ClipRect.w);
-            command_list.DrawIndexed(cmd.ElemCount, idx_offset, vtx_offset);
+            command_list.DrawIndexed(cmd.ElemCount, 1, idx_offset, vtx_offset, 0);
             idx_offset += cmd.ElemCount;
         }
         vtx_offset += cmd_list->VtxBuffer.Size;

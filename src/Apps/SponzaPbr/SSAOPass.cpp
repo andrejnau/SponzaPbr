@@ -93,7 +93,7 @@ void SSAOPass::OnRender(RenderCommandList& command_list)
         command_list.Attach(m_program.ps.srv.gPosition, m_input.geometry_pass.position);
         command_list.Attach(m_program.ps.srv.gNormal, m_input.geometry_pass.normal);
         command_list.Attach(m_program.ps.srv.noiseTexture, m_noise_texture);
-        command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+        command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
     }
     command_list.EndRenderPass();
 
@@ -111,7 +111,7 @@ void SSAOPass::OnRender(RenderCommandList& command_list)
         for (auto& range : m_input.square.ia.ranges)
         {
             command_list.Attach(m_program_blur.ps.srv.ssaoInput, m_ao);
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
         command_list.EndRenderPass();
 
@@ -148,7 +148,7 @@ void SSAOPass::OnModifySponzaSettings(const SponzaSettings& settings)
     }
 }
 
-void SSAOPass::SetDefines(ProgramHolder<SSAOPassPS, SSAOPassVS>& program)
+void SSAOPass::SetDefines(ProgramHolder<SSAOPass_PS, SSAOPass_VS>& program)
 {
     if (m_settings.Get<uint32_t>("sample_count") != 1)
         program.ps.desc.define["SAMPLE_COUNT"] = std::to_string(m_settings.Get<uint32_t>("sample_count"));

@@ -45,6 +45,7 @@ void Equirectangular2Cubemap::DrawEquirectangular2Cubemap(RenderCommandList& com
     glm::vec4 color = { 0.0f, 0.0f, 0.0f, 1.0f };
     RenderPassBeginDesc render_pass_desc = {};
     render_pass_desc.colors[m_program_equirectangular2cubemap.ps.om.rtv0].texture = output.environment;
+    render_pass_desc.colors[m_program_equirectangular2cubemap.ps.om.rtv0].view_desc.count = 1;
     render_pass_desc.colors[m_program_equirectangular2cubemap.ps.om.rtv0].clear_color = color;
     render_pass_desc.depth_stencil.texture = m_dsv;
     render_pass_desc.depth_stencil.clear_depth = 1.0f;
@@ -81,7 +82,7 @@ void Equirectangular2Cubemap::DrawEquirectangular2Cubemap(RenderCommandList& com
         command_list.Attach(m_program_equirectangular2cubemap.ps.srv.equirectangularMap, m_input.hdr);
         for (auto& range : m_input.model.ia.ranges)
         {
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();

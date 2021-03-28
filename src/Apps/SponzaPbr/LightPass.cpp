@@ -26,7 +26,7 @@ LightPass::LightPass(RenderDevice& device, const Input& input, int width, int he
         SamplerComparisonFunc::kLess });
 }
 
-void LightPass::SetDefines(ProgramHolder<LightPassPS, LightPassVS>& program)
+void LightPass::SetDefines(ProgramHolder<LightPass_PS, LightPass_VS>& program)
 {
     if (m_settings.Get<uint32_t>("sample_count") != 1)
         program.ps.desc.define["SAMPLE_COUNT"] = std::to_string(m_settings.Get<uint32_t>("sample_count"));
@@ -137,7 +137,7 @@ void LightPass::OnRender(RenderCommandList& command_list)
         if (m_settings.Get<bool>("use_shadow"))
             command_list.Attach(m_program.ps.srv.LightCubeShadowMap, m_input.shadow_pass.srv);
 
-        command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+        command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
     }
     command_list.EndRenderPass();
 }

@@ -82,7 +82,7 @@ void GeometryPass::OnRender(RenderCommandList& command_list)
             command_list.Attach(m_program.ps.srv.aoMap, material.texture.occlusion);
             command_list.Attach(m_program.ps.srv.alphaMap, material.texture.opacity);
 
-            command_list.DrawIndexed(range.index_count, range.start_index_location, range.base_vertex_location);
+            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();
