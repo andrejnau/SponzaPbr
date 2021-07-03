@@ -32,4 +32,4 @@ cmake --build . --config RelWithDebInfo
 
 ## Requirements
 * Windows SDK Version 10.0.19041.0
-* Vulkan SDK 1.2.162.0 if you build this with VULKAN_SUPPORT=ON (enabled by default)
+* Vulkan SDK 1.2.176.1 if you build this with VULKAN_SUPPORT=ON (enabled by default)
