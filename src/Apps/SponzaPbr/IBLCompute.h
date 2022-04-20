@@ -7,7 +7,6 @@
 #include <Camera/Camera.h>
 #include <Geometry/Geometry.h>
 #include <ProgramRef/IBLCompute_VS.h>
-#include <ProgramRef/IBLCompute_GS.h>
 #include <ProgramRef/IBLCompute_PS.h>
 #include <ProgramRef/IBLComputePrePass_PS.h>
 #include <ProgramRef/DownSample_CS.h>
@@ -47,8 +46,8 @@ private:
     SponzaSettings m_settings;
     RenderDevice& m_device;
     Input m_input;
-    ProgramHolder<IBLCompute_VS, IBLCompute_GS, IBLCompute_PS> m_program;
-    ProgramHolder<IBLCompute_VS, IBLCompute_GS, IBLComputePrePass_PS> m_program_pre_pass;
+    ProgramHolder<IBLCompute_VS, IBLCompute_PS> m_program;
+    ProgramHolder<IBLCompute_VS, IBLComputePrePass_PS> m_program_pre_pass;
     ProgramHolder<Background_VS, Background_PS> m_program_backgroud;
     ProgramHolder<DownSample_CS> m_program_downsample;
     std::shared_ptr<Resource> m_dsv;

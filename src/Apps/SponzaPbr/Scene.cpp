@@ -1,5 +1,5 @@
 #include "Scene.h"
-#include <Utilities/FileUtility.h>
+#include <Utilities/SystemUtils.h>
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <glm/gtx/transform.hpp>
@@ -85,8 +85,8 @@ Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height
             continue;
 
         model.ibl_source = ++layer;
-        IrradianceConversion::Target irradince{ m_irradince, m_depth_stencil_view_irradince, model.ibl_source, m_irradince_texture_size };
-        IrradianceConversion::Target prefilter{ m_prefilter, m_depth_stencil_view_prefilter, model.ibl_source, m_prefilter_texture_size };
+        IrradianceConversion::Target irradince{ m_irradince, m_depth_stencil_view_irradince, (size_t)model.ibl_source, (size_t)m_irradince_texture_size };
+        IrradianceConversion::Target prefilter{ m_prefilter, m_depth_stencil_view_prefilter, (size_t)model.ibl_source, (size_t)m_prefilter_texture_size };
         m_irradiance_conversion.emplace_back(new IrradianceConversion(*m_device, { m_model_cube, model.ibl_rtv, irradince, prefilter }));
     }
 

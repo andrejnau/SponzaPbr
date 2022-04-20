@@ -162,7 +162,7 @@ SponzaSettings::SponzaSettings()
     add_checkbox("dynamic_sun_position", false).BindKey(GLFW_KEY_SPACE);
     add_slider("s_near", 0.1, 0.01, 10, true);
     add_slider("s_far", 1024.0, 128, 4096, true);
-    add_slider("s_size", 3072, 128, 8192, true);
+    add_slider("s_size", 2048, 128, 8192, true);
 }
 
 bool SponzaSettings::OnDraw()

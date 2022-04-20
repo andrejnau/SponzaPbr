@@ -202,7 +202,7 @@ float3 CookTorrance_GGX(float3 fragPos, float3 n, float3 v, Material m, float3 l
     return (kD * m.albedo / PI + specular) * radiance * NdotL;
 }
 
-struct GeometryOutput
+struct VS_OUTPUT
 {
     float4 pos       : SV_POSITION;
     float3 fragPos   : POSITION;
@@ -239,7 +239,7 @@ struct PS_OUT
     float4 gAlbedo   : SV_Target0;
 };
 
-float3 CalcBumpedNormal(GeometryOutput input)
+float3 CalcBumpedNormal(VS_OUTPUT input)
 {
     float3 N = normalize(input.normal);
     float3 T = normalize(input.tangent);
@@ -259,7 +259,7 @@ float3 CalcBumpedNormal(GeometryOutput input)
     return normal;
 }
 
-float4 main(GeometryOutput input) : SV_TARGET
+float4 main(VS_OUTPUT input) : SV_TARGET
 {
     float3 lighting = 0;
 

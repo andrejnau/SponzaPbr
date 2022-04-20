@@ -21,15 +21,10 @@
 ### SponzaPbr Settings
 Press Tab to open settings menu
 
-## Build
+## Cloning repository
 ```
-python init.py
-mkdir build
-cd build
-cmake -G "Visual Studio 16 2019" -Ax64 ..
-cmake --build . --config RelWithDebInfo
+git clone --recursive https://github.com/andrejnau/SponzaPbr.git
 ```
 
 ## Requirements
-* Windows SDK Version 10.0.19041.0
-* Vulkan SDK 1.2.176.1 if you build this with VULKAN_SUPPORT=ON (enabled by default)
+* https://github.com/andrejnau/FlyCube#build-requirements

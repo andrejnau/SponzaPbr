@@ -18,7 +18,7 @@ TEXTURE_TYPE gPosition;
 TEXTURE_TYPE gNormal;
 Texture2D noiseTexture;
 
-#define KERNEL_SIZE 64
+#define KERNEL_SIZE 16
 #define KERNEL_PER_SAMPLE (KERNEL_SIZE / SAMPLE_COUNT)
 
 cbuffer SSAOBuffer

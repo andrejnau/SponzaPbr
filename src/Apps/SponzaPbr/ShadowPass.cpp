@@ -27,9 +27,9 @@ void ShadowPass::OnUpdate()
 
     glm::vec3 position = m_input.light_pos;
 
-    m_program.gs.cbuffer.GSParams.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
+    m_program.vs.cbuffer.VSParams.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
 
-    std::array<glm::mat4, 6>& view = m_program.gs.cbuffer.GSParams.View;
+    std::array<glm::mat4, 6>& view = m_program.vs.cbuffer.VSParams.View;
     view[0] = glm::transpose(glm::lookAt(position, position + Right, Up));
     view[1] = glm::transpose(glm::lookAt(position, position + Left, Up));
     view[2] = glm::transpose(glm::lookAt(position, position + Up, BackwardRH));
@@ -47,8 +47,6 @@ void ShadowPass::OnRender(RenderCommandList& command_list)
 
     command_list.UseProgram(m_program);
     command_list.Attach(m_program.vs.cbv.VSParams, m_program.vs.cbuffer.VSParams);
-    command_list.Attach(m_program.gs.cbv.GSParams, m_program.gs.cbuffer.GSParams);
-
     command_list.Attach(m_program.ps.sampler.g_sampler, m_sampler);
 
     glm::vec4 color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -76,7 +74,7 @@ void ShadowPass::OnRender(RenderCommandList& command_list)
             else
                 command_list.Attach(m_program.ps.srv.alphaMap);
 
-            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
+            command_list.DrawIndexed(range.index_count, 6, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();

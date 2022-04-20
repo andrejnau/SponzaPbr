@@ -114,7 +114,6 @@ void IBLCompute::DrawPrePass(RenderCommandList& command_list, Model & ibl_model)
 {
     command_list.UseProgram(m_program_pre_pass);
     command_list.Attach(m_program_pre_pass.vs.cbv.ConstantBuf, m_program_pre_pass.vs.cbuffer.ConstantBuf);
-    command_list.Attach(m_program_pre_pass.gs.cbv.GSParams, m_program_pre_pass.gs.cbuffer.GSParams);
 
     command_list.Attach(m_program_pre_pass.ps.sampler.g_sampler, m_sampler);
 
@@ -127,10 +126,10 @@ void IBLCompute::DrawPrePass(RenderCommandList& command_list, Model & ibl_model)
     glm::vec3 BackwardRH = glm::vec3(0.0f, 0.0f, 1.0f);
     glm::vec3 BackwardLH = glm::vec3(0.0f, 0.0f, -1.0f);
 
-    m_program_pre_pass.gs.cbuffer.GSParams.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
+    m_program_pre_pass.vs.cbuffer.ConstantBuf.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
 
     glm::vec3 position = glm::vec3(ibl_model.matrix * glm::vec4(ibl_model.model_center, 1.0));
-    std::array<glm::mat4, 6>& view = m_program_pre_pass.gs.cbuffer.GSParams.View;
+    std::array<glm::mat4, 6>& view = m_program_pre_pass.vs.cbuffer.ConstantBuf.View;
     view[0] = glm::transpose(glm::lookAt(position, position + Right, Up));
     view[1] = glm::transpose(glm::lookAt(position, position + Left, Up));
     view[2] = glm::transpose(glm::lookAt(position, position + Up, BackwardRH));
@@ -161,22 +160,22 @@ void IBLCompute::DrawPrePass(RenderCommandList& command_list, Model & ibl_model)
         std::shared_ptr<Resource> bones_info_srv = model.bones.GetBonesInfo();
         std::shared_ptr<Resource> bone_srv = model.bones.GetBone();
 
-        command_list.Attach(m_program_pre_pass.vs.srv.bone_info, bones_info_srv);
-        command_list.Attach(m_program_pre_pass.vs.srv.gBones, bone_srv);
-
+        /*command_list.Attach(m_program_pre_pass.vs.srv.bone_info, bones_info_srv);
+        command_list.Attach(m_program_pre_pass.vs.srv.gBones, bone_srv);*/
+        
         model.ia.indices.Bind(command_list);
         model.ia.positions.BindToSlot(command_list, m_program_pre_pass.vs.ia.POSITION);
         model.ia.normals.BindToSlot(command_list, m_program_pre_pass.vs.ia.NORMAL);
         model.ia.texcoords.BindToSlot(command_list, m_program_pre_pass.vs.ia.TEXCOORD);
         model.ia.tangents.BindToSlot(command_list, m_program_pre_pass.vs.ia.TANGENT);
-        model.ia.bones_offset.BindToSlot(command_list, m_program_pre_pass.vs.ia.BONES_OFFSET);
-        model.ia.bones_count.BindToSlot(command_list, m_program_pre_pass.vs.ia.BONES_COUNT);
+        /*model.ia.bones_offset.BindToSlot(command_list, m_program_pre_pass.vs.ia.BONES_OFFSET);
+        model.ia.bones_count.BindToSlot(command_list, m_program_pre_pass.vs.ia.BONES_COUNT);*/
 
         for (auto& range : model.ia.ranges)
         {
             auto& material = model.GetMaterial(range.id);
             command_list.Attach(m_program_pre_pass.ps.srv.alphaMap, material.texture.opacity);
-            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
+            command_list.DrawIndexed(range.index_count, 6, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();
@@ -186,7 +185,6 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
 {
     command_list.UseProgram(m_program);
     command_list.Attach(m_program.vs.cbv.ConstantBuf, m_program.vs.cbuffer.ConstantBuf);
-    command_list.Attach(m_program.gs.cbv.GSParams, m_program.gs.cbuffer.GSParams);
     command_list.Attach(m_program.ps.cbv.Light, m_program.ps.cbuffer.Light);
     command_list.Attach(m_program.ps.cbv.ShadowParams, m_program.ps.cbuffer.ShadowParams);
     command_list.Attach(m_program.ps.cbv.Settings, m_program.ps.cbuffer.Settings);
@@ -203,12 +201,12 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
     glm::vec3 BackwardRH = glm::vec3(0.0f, 0.0f, 1.0f);
     glm::vec3 BackwardLH = glm::vec3(0.0f, 0.0f, -1.0f);
 
-    m_program.gs.cbuffer.GSParams.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
+    m_program.vs.cbuffer.ConstantBuf.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
 
     glm::vec4 color = { 0.0f, 0.0f, 0.0f, 1.0f };
 
     glm::vec3 position = glm::vec3(ibl_model.matrix * glm::vec4(ibl_model.model_center, 1.0));
-    std::array<glm::mat4, 6>& view = m_program.gs.cbuffer.GSParams.View;
+    std::array<glm::mat4, 6>& view = m_program.vs.cbuffer.ConstantBuf.View;
     view[0] = glm::transpose(glm::lookAt(position, position + Right, Up));
     view[1] = glm::transpose(glm::lookAt(position, position + Left, Up));
     view[2] = glm::transpose(glm::lookAt(position, position + Up, BackwardRH));
@@ -251,16 +249,16 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
         std::shared_ptr<Resource> bones_info_srv = model.bones.GetBonesInfo();
         std::shared_ptr<Resource> bone_srv = model.bones.GetBone();
 
-        command_list.Attach(m_program.vs.srv.bone_info, bones_info_srv);
-        command_list.Attach(m_program.vs.srv.gBones, bone_srv);
-
+        /*command_list.Attach(m_program.vs.srv.bone_info, bones_info_srv);
+        command_list.Attach(m_program.vs.srv.gBones, bone_srv);*/
+        
         model.ia.indices.Bind(command_list);
         model.ia.positions.BindToSlot(command_list, m_program.vs.ia.POSITION);
         model.ia.normals.BindToSlot(command_list, m_program.vs.ia.NORMAL);
         model.ia.texcoords.BindToSlot(command_list, m_program.vs.ia.TEXCOORD);
         model.ia.tangents.BindToSlot(command_list, m_program.vs.ia.TANGENT);
-        model.ia.bones_offset.BindToSlot(command_list, m_program.vs.ia.BONES_OFFSET);
-        model.ia.bones_count.BindToSlot(command_list, m_program.vs.ia.BONES_COUNT);
+        /*model.ia.bones_offset.BindToSlot(command_list, m_program.vs.ia.BONES_OFFSET);
+        model.ia.bones_count.BindToSlot(command_list, m_program.vs.ia.BONES_COUNT);*/
 
         for (auto& range : model.ia.ranges)
         {
@@ -278,7 +276,7 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
             command_list.Attach(m_program.ps.srv.alphaMap, material.texture.opacity);
             command_list.Attach(m_program.ps.srv.LightCubeShadowMap, m_input.shadow_pass.srv);
 
-            command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
+            command_list.DrawIndexed(range.index_count, 6, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();

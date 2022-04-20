@@ -1,4 +1,4 @@
-struct GeometryOutput
+struct VertexOutput
 {
     float4 pos : SV_POSITION;
     float2 texCoord  : TEXCOORD;
@@ -16,7 +16,7 @@ bool HasTexture(Texture2D _texture)
     return width > 0 && height > 0;
 }
 
-void main(GeometryOutput input)
+void main(VertexOutput input)
 {
     if (HasTexture(alphaMap))
     {

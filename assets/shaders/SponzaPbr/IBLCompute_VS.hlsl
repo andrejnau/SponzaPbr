@@ -1,3 +1,5 @@
+#include "BoneTransform.hlsli"
+
 struct VS_INPUT
 {
     float3 pos        : POSITION;
@@ -8,19 +10,12 @@ struct VS_INPUT
     uint bones_count  : BONES_COUNT;
 };
 
-struct BoneInfo
-{
-    uint bone_id;
-    float weight;
-};
-
-StructuredBuffer<BoneInfo> bone_info;
-StructuredBuffer<float4x4> gBones;
-
 cbuffer ConstantBuf
 {
     float4x4 model;
     float4x4 normalMatrix;
+    float4x4 View[6];
+    float4x4 Projection;
 };
 
 struct VS_OUTPUT
@@ -30,37 +25,32 @@ struct VS_OUTPUT
     float3 normal    : NORMAL;
     float3 tangent   : TANGENT;
     float2 texCoord  : TEXCOORD;
+    uint RTIndex     : SV_RenderTargetArrayIndex;
 };
 
-VS_OUTPUT main(VS_INPUT vs_in)
+VS_OUTPUT main(VS_INPUT vs_in, uint instanceID : SV_InstanceID)
 {
-    VS_OUTPUT vs_out;
-    float4x4 transform = {
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 },
-        { 0, 0, 0, 0 }
+// TODO: figure out why this does not work if bone_info and gBones are unbound
+#if 0
+    float4x4 transform = GetBoneTransform(vs_in.bones_count, vs_in.bones_offset);
+#else
+   float4x4 transform = {
+        { 1, 0, 0, 0 },
+        { 0, 1, 0, 0 },
+        { 0, 0, 1, 0 },
+        { 0, 0, 0, 1 }
     };
-    for (uint i = 0; i < vs_in.bones_count; ++i)
-    {
-        transform += bone_info[i + vs_in.bones_offset].weight * gBones[bone_info[i + vs_in.bones_offset].bone_id];
-    }
-    if (vs_in.bones_count == 0)
-    {
-        float4x4 transform_identity = {
-            { 1, 0, 0, 0 },
-            { 0, 1, 0, 0 },
-            { 0, 0, 1, 0 },
-            { 0, 0, 0, 1 }
-        };
-        transform = transform_identity;
-    }
+#endif
+
+    VS_OUTPUT vs_out;
     float4 pos = mul(float4(vs_in.pos, 1.0), transform);
     float4 worldPos = mul(pos, model);
     vs_out.fragPos = worldPos.xyz;
-    vs_out.pos = worldPos;
+    float4 viewPosition = mul(worldPos, View[instanceID]);
+    vs_out.pos = mul(viewPosition, Projection);
     vs_out.texCoord = vs_in.texCoord;
     vs_out.normal = mul(mul(vs_in.normal, transform), (float3x3)normalMatrix);
     vs_out.tangent = mul(mul(vs_in.tangent, transform), (float3x3)normalMatrix);
+    vs_out.RTIndex = instanceID;
     return vs_out;
 }

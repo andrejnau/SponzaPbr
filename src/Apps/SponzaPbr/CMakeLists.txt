@@ -75,11 +75,6 @@ set(vertex_shaders
     ${shaders_path}/IBLCompute_VS.hlsl
 )
 
-set(geometry_shaders
-    ${shaders_path}/ShadowPass_GS.hlsl
-    ${shaders_path}/IBLCompute_GS.hlsl
-)
-
 set(compute_shaders
     ${shaders_path}/HDRLum1DPass_CS.hlsl
     ${shaders_path}/HDRLum2DPass_CS.hlsl
@@ -110,11 +105,6 @@ set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_TYPE Vertex)
 set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_MODEL 6.0)
 set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
 
-set_property(SOURCE ${geometry_shaders} PROPERTY VS_SHADER_ENTRYPOINT main)
-set_property(SOURCE ${geometry_shaders} PROPERTY VS_SHADER_TYPE Geometry)
-set_property(SOURCE ${geometry_shaders} PROPERTY VS_SHADER_MODEL 6.0)
-set_property(SOURCE ${geometry_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
-
 set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_ENTRYPOINT main)
 set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_TYPE Compute)
 set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_MODEL 6.0)
@@ -125,7 +115,7 @@ set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_TYPE Library)
 set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_MODEL 6.3)
 set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
 
-set(shaders_files ${pixel_shaders} ${vertex_shaders} ${geometry_shaders} ${compute_shaders} ${lib_shaders})
+set(shaders_files ${pixel_shaders} ${vertex_shaders} ${compute_shaders} ${lib_shaders})
 
 include(${project_root}/3rdparty/FlyCube/cmake/shader_parser.cmake)
 gen_shaders_ref(${target} "${shaders_files}" shaders_ref)

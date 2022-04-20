@@ -1,4 +1,4 @@
-struct GeometryOutput
+struct VS_OUTPUT
 {
     float4 pos       : SV_POSITION;
     float3 fragPos   : POSITION;
@@ -19,7 +19,7 @@ bool HasTexture(Texture2D _texture)
     return width > 0 && height > 0;
 }
 
-void main(GeometryOutput input)
+void main(VS_OUTPUT input)
 {
     if (HasTexture(alphaMap))
     {

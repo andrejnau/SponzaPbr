@@ -5,8 +5,11 @@
 
 #include <Geometry/IABuffer.h>
 #include <Utilities/FormatHelper.h>
+
+#if defined(_WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
+#endif
 
 ImGuiPass::ImGuiPass(RenderDevice& device, RenderCommandList& command_list, const Input& input, int width, int height, GLFWwindow* window)
     : m_device(device)
@@ -19,11 +22,14 @@ ImGuiPass::ImGuiPass(RenderDevice& device, RenderCommandList& command_list, cons
 {
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    io.DisplaySize = ImVec2((float)width, (float)height);
-    auto dpi = GetDpiForWindow(glfwGetWin32Window(window));
-    float scale = dpi / 96.0;
-    io.FontGlobalScale = scale;
-    ImGui::GetStyle().ScaleAllSizes(scale);
+    io.DisplaySize = ImVec2((float)m_width, (float)m_height);
+#if defined(_WIN32)
+    UINT dpi = GetDpiForWindow(glfwGetWin32Window(window));
+    io.FontGlobalScale = dpi / 96.0f;
+#else
+    io.FontGlobalScale = 2.0f;
+#endif
+    ImGui::GetStyle().ScaleAllSizes(io.FontGlobalScale);
 
     InitKey();
     CreateFontsTexture(command_list);
@@ -161,7 +167,11 @@ void ImGuiPass::OnKey(int key, int action)
 void ImGuiPass::OnMouse(bool first, double xpos, double ypos)
 {
     ImGuiIO& io = ImGui::GetIO();
+#if defined(__APPLE__)
+    io.MousePos = ImVec2(xpos * io.FontGlobalScale, ypos * io.FontGlobalScale);
+#else
     io.MousePos = ImVec2(xpos, ypos);
+#endif
 }
 
 void ImGuiPass::OnMouseButton(int button, int action)
@@ -174,7 +184,11 @@ void ImGuiPass::OnMouseButton(int button, int action)
 void ImGuiPass::OnScroll(double xoffset, double yoffset)
 {
     ImGuiIO& io = ImGui::GetIO();
+#if defined(__APPLE__)
+    io.MouseWheel += yoffset * io.FontGlobalScale;
+#else
     io.MouseWheel += yoffset;
+#endif
 }
 
 void ImGuiPass::OnInputChar(unsigned int ch)
