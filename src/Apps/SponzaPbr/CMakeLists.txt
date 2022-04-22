@@ -145,6 +145,7 @@ target_link_libraries(${target}
     Utilities
     Texture
     imgui
+    SponzaPbrAssets
 )
 
 set_target_properties(${target} PROPERTIES FOLDER "Apps")
