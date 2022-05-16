@@ -35,7 +35,7 @@ class Scene
     , public IModifySponzaSettings
 {
 public:
-    Scene(const Settings& settings, GLFWwindow* window, int width, int height);
+    Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLFWwindow* window, int width, int height);
     ~Scene();
 
     RenderDevice& GetRenderDevice()

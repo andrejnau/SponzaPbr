@@ -4,8 +4,8 @@
 #include <chrono>
 #include <glm/gtx/transform.hpp>
 
-Scene::Scene(const Settings& settings, GLFWwindow* window, int width, int height)
-    : m_device(CreateRenderDevice(settings, window))
+Scene::Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLFWwindow* window, int width, int height)
+    : m_device(device)
     , m_window(window)
     , m_width(width)
     , m_height(height)
