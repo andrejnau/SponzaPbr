@@ -7,7 +7,7 @@
 #include <ProgramRef/Background_PS.h>
 #include <ProgramRef/Background_VS.h>
 
-class BackgroundPass : public IPass, public IModifySponzaSettings
+class BackgroundPass : public IPass
 {
 public:
     struct Input

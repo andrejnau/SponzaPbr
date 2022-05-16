@@ -9,7 +9,7 @@
 #include <ProgramRef/SSAOPass_VS.h>
 #include <ProgramRef/SSAOBlurPass_PS.h>
 
-class SSAOPass : public IPass, public IModifySponzaSettings
+class SSAOPass : public IPass
 {
 public:
     struct Input

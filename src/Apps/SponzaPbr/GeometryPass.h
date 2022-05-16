@@ -8,7 +8,7 @@
 #include <ProgramRef/GeometryPass_PS.h>
 #include <ProgramRef/GeometryPass_VS.h>
 
-class GeometryPass : public IPass, public IModifySponzaSettings
+class GeometryPass : public IPass
 {
 public:
     struct Input

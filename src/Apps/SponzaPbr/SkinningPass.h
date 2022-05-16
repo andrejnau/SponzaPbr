@@ -6,7 +6,7 @@
 #include <Geometry/Geometry.h>
 #include <ProgramRef/Skinning_CS.h>
 
-class SkinningPass : public IPass, public IModifySponzaSettings
+class SkinningPass : public IPass
 {
 public:
     struct Input

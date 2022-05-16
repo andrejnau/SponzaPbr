@@ -8,7 +8,7 @@
 #include <ProgramRef/IrradianceConvolution_PS.h>
 #include <ProgramRef/Prefilter_PS.h>
 
-class IrradianceConversion : public IPass, public IModifySponzaSettings
+class IrradianceConversion : public IPass
 {
 public:
     struct Target

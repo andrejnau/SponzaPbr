@@ -8,7 +8,7 @@
 #include <ProgramRef/ShadowPass_PS.h>
 #include "SponzaSettings.h"
 
-class ShadowPass : public IPass, public IModifySponzaSettings
+class ShadowPass : public IPass
 {
 public:
     struct Input

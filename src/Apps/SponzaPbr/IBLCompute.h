@@ -15,7 +15,7 @@
 #include "SponzaSettings.h"
 #include "ShadowPass.h"
 
-class IBLCompute : public IPass, public IModifySponzaSettings
+class IBLCompute : public IPass
 {
 public:
     struct Input

@@ -9,7 +9,7 @@
 #include <ProgramRef/HDRApply_PS.h>
 #include <ProgramRef/HDRApply_VS.h>
 
-class ComputeLuminance : public IPass, public IModifySponzaSettings
+class ComputeLuminance : public IPass
 {
 public:
     struct Input

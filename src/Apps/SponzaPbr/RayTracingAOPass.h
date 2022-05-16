@@ -8,7 +8,7 @@
 #include <ProgramRef/SSAOPass_VS.h>
 #include <ProgramRef/SSAOBlurPass_PS.h>
 
-class RayTracingAOPass : public IPass, public IModifySponzaSettings
+class RayTracingAOPass : public IPass
 {
 public:
     struct Input

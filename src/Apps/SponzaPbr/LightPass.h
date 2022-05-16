@@ -12,7 +12,7 @@
 #include <ProgramRef/LightPass_PS.h>
 #include <ProgramRef/LightPass_VS.h>
 
-class LightPass : public IPass, public IModifySponzaSettings
+class LightPass : public IPass
 {
 public:
     struct Input

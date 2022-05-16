@@ -10,7 +10,7 @@
 #include <ProgramRef/Prefilter_PS.h>
 #include <ProgramRef/DownSample_CS.h>
 
-class Equirectangular2Cubemap : public IPass, public IModifySponzaSettings
+class Equirectangular2Cubemap : public IPass
 {
 public:
     struct Input

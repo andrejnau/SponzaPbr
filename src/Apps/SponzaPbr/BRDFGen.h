@@ -7,7 +7,7 @@
 #include <ProgramRef/BRDF_PS.h>
 #include <ProgramRef/BRDF_VS.h>
 
-class BRDFGen : public IPass, public IModifySponzaSettings
+class BRDFGen : public IPass
 {
 public:
     struct Input
