@@ -1,6 +1,6 @@
 ## SponzaPbr
 
-[FlyCube](https://github.com/andrejnau/FlyCube) is used as a rendering backend
+[FlyWrapper](https://github.com/andrejnau/FlyWrapper) is used as a rendering backend.
 
 * Features
   * Deferred rendering

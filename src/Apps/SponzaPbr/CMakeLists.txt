@@ -117,7 +117,7 @@ set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-s
 
 set(shaders_files ${pixel_shaders} ${vertex_shaders} ${compute_shaders} ${lib_shaders})
 
-include(${project_root}/3rdparty/FlyCube/cmake/shader_parser.cmake)
+include(${project_root}/3rdparty/FlyWrapper/cmake/shader_parser.cmake)
 gen_shaders_ref(${target} "${shaders_files}" shaders_ref)
 
 source_group("Shader Files" FILES ${shaders_files} ${shader_headers})

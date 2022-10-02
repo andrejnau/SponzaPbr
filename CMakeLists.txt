@@ -10,7 +10,7 @@ list(PREPEND CMAKE_MODULE_PATH "${project_root}/cmake")
 include(cmake_settings)
 include(compiler_settings)
 
-add_subdirectory(3rdparty/FlyCube)
+add_subdirectory(3rdparty/FlyWrapper)
 include(3rdparty/imgui)
 
 add_subdirectory(src)
