@@ -1,22 +1,19 @@
 #pragma once
 
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "GeometryPass.h"
+#include "IrradianceConversion.h"
+#include "ProgramRef/LightPass_PS.h"
+#include "ProgramRef/LightPass_VS.h"
+#include "RenderPass.h"
 #include "SSAOPass.h"
 #include "ShadowPass.h"
-#include "IrradianceConversion.h"
 #include "SponzaSettings.h"
 
-#include "RenderPass.h"
-#include <Device/Device.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/LightPass_PS.h>
-#include <ProgramRef/LightPass_VS.h>
-
-class LightPass : public IPass
-{
+class LightPass : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         GeometryPass::Output& geometry_pass;
         ShadowPass::Output& shadow_pass;
         SSAOPass::Output& ssao_pass;
@@ -29,15 +26,14 @@ public:
         std::shared_ptr<Resource>& brdf;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> rtv;
     } output;
 
     LightPass(RenderDevice& device, const Input& input, int width, int height);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnResize(int width, int height) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 

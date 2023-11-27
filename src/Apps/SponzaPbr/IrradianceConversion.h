@@ -1,40 +1,36 @@
 #pragma once
 
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "GeometryPass.h"
+#include "ProgramRef/Cubemap_VS.h"
+#include "ProgramRef/IrradianceConvolution_PS.h"
+#include "ProgramRef/Prefilter_PS.h"
 #include "SponzaSettings.h"
-#include <Device/Device.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/Cubemap_VS.h>
-#include <ProgramRef/IrradianceConvolution_PS.h>
-#include <ProgramRef/Prefilter_PS.h>
 
-class IrradianceConversion : public IPass
-{
+class IrradianceConversion : public IPass {
 public:
-    struct Target
-    {
+    struct Target {
         std::shared_ptr<Resource>& res;
         std::shared_ptr<Resource>& dsv;
         size_t layer;
         size_t size;
     };
 
-    struct Input
-    {
+    struct Input {
         Model& model;
         std::shared_ptr<Resource>& environment;
         Target irradince;
         Target prefilter;
     };
 
-    struct Output
-    {
+    struct Output {
     } output;
 
     IrradianceConversion(RenderDevice& device, const Input& input);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 
 private:

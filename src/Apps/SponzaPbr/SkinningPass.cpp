@@ -7,24 +7,21 @@ SkinningPass::SkinningPass(RenderDevice& device, const Input& input)
 {
 }
 
-void SkinningPass::OnUpdate()
-{
-}
+void SkinningPass::OnUpdate() {}
 
 void SkinningPass::OnRender(RenderCommandList& command_list)
 {
     command_list.UseProgram(m_program);
     command_list.Attach(m_program.cs.cbv.cb, m_program.cs.cbuffer.cb);
 
-    for (auto& model : m_input.scene_list)
-    {
+    for (auto& model : m_input.scene_list) {
         model.bones.UpdateAnimation(m_device, command_list, glfwGetTime());
     }
 
-    for (auto& model : m_input.scene_list)
-    {
-        if (!model.bones.HasAnimation())
+    for (auto& model : m_input.scene_list) {
+        if (!model.bones.HasAnimation()) {
             continue;
+        }
         std::shared_ptr<Resource> bones_info_srv = model.bones.GetBonesInfo();
         std::shared_ptr<Resource> bone_srv = model.bones.GetBone();
 
@@ -43,8 +40,7 @@ void SkinningPass::OnRender(RenderCommandList& command_list)
         command_list.Attach(m_program.cs.uav.out_normal, model.ia.normals.GetDynamicBuffer());
         command_list.Attach(m_program.cs.uav.out_tangent, model.ia.tangents.GetDynamicBuffer());
 
-        for (auto& range : model.ia.ranges)
-        {
+        for (auto& range : model.ia.ranges) {
             m_program.cs.cbuffer.cb.IndexCount = range.index_count;
             m_program.cs.cbuffer.cb.StartIndexLocation = range.start_index_location;
             m_program.cs.cbuffer.cb.BaseVertexLocation = range.base_vertex_location;

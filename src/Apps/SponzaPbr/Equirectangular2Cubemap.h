@@ -1,33 +1,30 @@
 #pragma once
 
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "GeometryPass.h"
+#include "ProgramRef/Cubemap_VS.h"
+#include "ProgramRef/DownSample_CS.h"
+#include "ProgramRef/Equirectangular2Cubemap_PS.h"
+#include "ProgramRef/IrradianceConvolution_PS.h"
+#include "ProgramRef/Prefilter_PS.h"
 #include "SponzaSettings.h"
-#include <Device/Device.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/Cubemap_VS.h>
-#include <ProgramRef/Equirectangular2Cubemap_PS.h>
-#include <ProgramRef/IrradianceConvolution_PS.h>
-#include <ProgramRef/Prefilter_PS.h>
-#include <ProgramRef/DownSample_CS.h>
 
-class Equirectangular2Cubemap : public IPass
-{
+class Equirectangular2Cubemap : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         Model& model;
         std::shared_ptr<Resource>& hdr;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> environment;
     } output;
 
     Equirectangular2Cubemap(RenderDevice& device, const Input& input);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 
 private:

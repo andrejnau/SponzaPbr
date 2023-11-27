@@ -1,4 +1,5 @@
 #include "Equirectangular2Cubemap.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -11,20 +12,21 @@ Equirectangular2Cubemap::Equirectangular2Cubemap(RenderDevice& device, const Inp
     CreateSizeDependentResources();
 
     m_sampler = m_device.CreateSampler({
-    SamplerFilter::kAnisotropic,
-    SamplerTextureAddressMode::kWrap,
-    SamplerComparisonFunc::kNever });
+        SamplerFilter::kAnisotropic,
+        SamplerTextureAddressMode::kWrap,
+        SamplerComparisonFunc::kNever,
+    });
 }
 
 void Equirectangular2Cubemap::OnUpdate()
 {
-    m_program_equirectangular2cubemap.vs.cbuffer.ConstantBuf.projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
+    m_program_equirectangular2cubemap.vs.cbuffer.ConstantBuf.projection =
+        glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
 }
 
 void Equirectangular2Cubemap::OnRender(RenderCommandList& command_list)
 {
-    if (!is || m_settings.Get<bool>("irradiance_conversion_every_frame"))
-    {
+    if (!is || m_settings.Get<bool>("irradiance_conversion_every_frame")) {
         command_list.BeginEvent("DrawEquirectangular2Cubemap");
         DrawEquirectangular2Cubemap(command_list);
         command_list.EndEvent();
@@ -38,7 +40,8 @@ void Equirectangular2Cubemap::DrawEquirectangular2Cubemap(RenderCommandList& com
     command_list.SetViewport(0, 0, m_texture_size, m_texture_size);
 
     command_list.UseProgram(m_program_equirectangular2cubemap);
-    command_list.Attach(m_program_equirectangular2cubemap.vs.cbv.ConstantBuf, m_program_equirectangular2cubemap.vs.cbuffer.ConstantBuf);
+    command_list.Attach(m_program_equirectangular2cubemap.vs.cbv.ConstantBuf,
+                        m_program_equirectangular2cubemap.vs.cbuffer.ConstantBuf);
 
     command_list.Attach(m_program_equirectangular2cubemap.ps.sampler.g_sampler, m_sampler);
 
@@ -64,34 +67,27 @@ void Equirectangular2Cubemap::DrawEquirectangular2Cubemap(RenderCommandList& com
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    glm::mat4 capture_views[] =
-    {
-        glm::lookAt(position, position + Right, Up),
-        glm::lookAt(position, position + Left, Up),
-        glm::lookAt(position, position + Up, BackwardRH),
-        glm::lookAt(position, position + Down, ForwardRH),
-        glm::lookAt(position, position + BackwardLH, Up),
-        glm::lookAt(position, position + ForwardLH, Up)
+    glm::mat4 capture_views[] = {
+        glm::lookAt(position, position + Right, Up),      glm::lookAt(position, position + Left, Up),
+        glm::lookAt(position, position + Up, BackwardRH), glm::lookAt(position, position + Down, ForwardRH),
+        glm::lookAt(position, position + BackwardLH, Up), glm::lookAt(position, position + ForwardLH, Up),
     };
 
     command_list.BeginRenderPass(render_pass_desc);
-    for (uint32_t i = 0; i < 6; ++i)
-    {
+    for (uint32_t i = 0; i < 6; ++i) {
         m_program_equirectangular2cubemap.vs.cbuffer.ConstantBuf.face = i;
         m_program_equirectangular2cubemap.vs.cbuffer.ConstantBuf.view = glm::transpose(capture_views[i]);
         command_list.Attach(m_program_equirectangular2cubemap.ps.srv.equirectangularMap, m_input.hdr);
-        for (auto& range : m_input.model.ia.ranges)
-        {
+        for (auto& range : m_input.model.ia.ranges) {
             command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
     command_list.EndRenderPass();
 
     command_list.UseProgram(m_program_downsample);
-    for (size_t i = 1; i < m_texture_mips; ++i)
-    {
-        command_list.Attach(m_program_downsample.cs.srv.inputTexture, output.environment, {i - 1, 1});
-        command_list.Attach(m_program_downsample.cs.uav.outputTexture, output.environment, {i, 1});
+    for (size_t i = 1; i < m_texture_mips; ++i) {
+        command_list.Attach(m_program_downsample.cs.srv.inputTexture, output.environment, { i - 1, 1 });
+        command_list.Attach(m_program_downsample.cs.uav.outputTexture, output.environment, { i, 1 });
         command_list.Dispatch((m_texture_size >> i) / 8, (m_texture_size >> i) / 8, 6);
     }
 }
@@ -99,15 +95,18 @@ void Equirectangular2Cubemap::DrawEquirectangular2Cubemap(RenderCommandList& com
 void Equirectangular2Cubemap::CreateSizeDependentResources()
 {
     m_texture_mips = 0;
-    for (size_t i = 0; ; ++i)
-    {
-        if ((m_texture_size >> i) % 8 != 0)
+    for (size_t i = 0;; ++i) {
+        if ((m_texture_size >> i) % 8 != 0) {
             break;
+        }
         ++m_texture_mips;
     }
 
-    output.environment = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource | BindFlag::kUnorderedAccess, gli::format::FORMAT_RGBA32_SFLOAT_PACK32, 1, m_texture_size, m_texture_size, 6, m_texture_mips);
-    m_dsv = m_device.CreateTexture(BindFlag::kDepthStencil, gli::format::FORMAT_D32_SFLOAT_PACK32, 1, m_texture_size, m_texture_size, 6);
+    output.environment = m_device.CreateTexture(
+        BindFlag::kRenderTarget | BindFlag::kShaderResource | BindFlag::kUnorderedAccess,
+        gli::format::FORMAT_RGBA32_SFLOAT_PACK32, 1, m_texture_size, m_texture_size, 6, m_texture_mips);
+    m_dsv = m_device.CreateTexture(BindFlag::kDepthStencil, gli::format::FORMAT_D32_SFLOAT_PACK32, 1, m_texture_size,
+                                   m_texture_size, 6);
 }
 
 void Equirectangular2Cubemap::OnModifySponzaSettings(const SponzaSettings& settings)

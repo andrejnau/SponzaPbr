@@ -1,17 +1,22 @@
 #include "ImGuiPass.h"
 
+#include "Geometry/IABuffer.h"
+#include "Utilities/FormatHelper.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include <Geometry/IABuffer.h>
-#include <Utilities/FormatHelper.h>
 
 #if defined(_WIN32)
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <GLFW/glfw3native.h>
 #endif
 
-ImGuiPass::ImGuiPass(RenderDevice& device, RenderCommandList& command_list, const Input& input, int width, int height, GLFWwindow* window)
+ImGuiPass::ImGuiPass(RenderDevice& device,
+                     RenderCommandList& command_list,
+                     const Input& input,
+                     int width,
+                     int height,
+                     GLFWwindow* window)
     : m_device(device)
     , m_input(input)
     , m_width(width)
@@ -36,7 +41,8 @@ ImGuiPass::ImGuiPass(RenderDevice& device, RenderCommandList& command_list, cons
     m_sampler = m_device.CreateSampler({
         SamplerFilter::kMinMagMipLinear,
         SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kAlways });
+        SamplerComparisonFunc::kAlways,
+    });
 }
 
 ImGuiPass::~ImGuiPass()
@@ -44,14 +50,13 @@ ImGuiPass::~ImGuiPass()
     ImGui::DestroyContext();
 }
 
-void ImGuiPass::OnUpdate()
-{
-}
+void ImGuiPass::OnUpdate() {}
 
 void ImGuiPass::OnRender(RenderCommandList& command_list)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) != GLFW_CURSOR_NORMAL)
+    if (glfwGetInputMode(m_window, GLFW_CURSOR) != GLFW_CURSOR_NORMAL) {
         return;
+    }
 
     m_imgui_settings.NewFrame();
 
@@ -64,11 +69,9 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
     std::vector<glm::vec4> colors;
     std::vector<uint32_t> indices;
 
-    for (int i = 0; i < draw_data->CmdListsCount; ++i)
-    {
+    for (int i = 0; i < draw_data->CmdListsCount; ++i) {
         const ImDrawList* cmd_list = draw_data->CmdLists[i];
-        for (int j = 0; j < cmd_list->VtxBuffer.Size; ++j)
-        {
+        for (int j = 0; j < cmd_list->VtxBuffer.Size; ++j) {
             auto& pos = cmd_list->VtxBuffer.Data[j].pos;
             auto& uv = cmd_list->VtxBuffer.Data[j].uv;
             uint8_t* col = reinterpret_cast<uint8_t*>(&cmd_list->VtxBuffer.Data[j].col);
@@ -76,8 +79,7 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
             texcoords.push_back({ uv.x, uv.y });
             colors.push_back({ col[0] / 255.0, col[1] / 255.0, col[2] / 255.0, col[3] / 255.0 });
         }
-        for (int j = 0; j < cmd_list->IdxBuffer.Size; ++j)
-        {
+        for (int j = 0; j < cmd_list->IdxBuffer.Size; ++j) {
             indices.push_back(cmd_list->IdxBuffer.Data[j]);
         }
     }
@@ -86,7 +88,8 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
     m_positions_buffer[index].reset(new IAVertexBuffer(m_device, command_list, positions));
     m_texcoords_buffer[index].reset(new IAVertexBuffer(m_device, command_list, texcoords));
     m_colors_buffer[index].reset(new IAVertexBuffer(m_device, command_list, colors));
-    m_indices_buffer[index].reset(new IAIndexBuffer(m_device, command_list, indices, gli::format::FORMAT_R32_UINT_PACK32));
+    m_indices_buffer[index].reset(
+        new IAIndexBuffer(m_device, command_list, indices, gli::format::FORMAT_R32_UINT_PACK32));
 
     command_list.UseProgram(m_program);
     command_list.Attach(m_program.vs.cbv.vertexBuffer, m_program.vs.cbuffer.vertexBuffer);
@@ -104,15 +107,8 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
 
     command_list.Attach(m_program.ps.sampler.sampler0, m_sampler);
 
-    command_list.SetBlendState({
-        true,
-        Blend::kSrcAlpha,
-        Blend::kInvSrcAlpha,
-        BlendOp::kAdd,
-        Blend::kInvSrcAlpha,
-        Blend::kZero,
-        BlendOp::kAdd
-    });
+    command_list.SetBlendState({ true, Blend::kSrcAlpha, Blend::kInvSrcAlpha, BlendOp::kAdd, Blend::kInvSrcAlpha,
+                                 Blend::kZero, BlendOp::kAdd });
 
     command_list.SetRasterizeState({ FillMode::kSolid, CullMode::kNone });
     command_list.SetDepthStencilState({ false, ComparisonFunc::kLessEqual });
@@ -121,11 +117,9 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
     int vtx_offset = 0;
     int idx_offset = 0;
     command_list.BeginRenderPass(render_pass_desc);
-    for (int i = 0; i < draw_data->CmdListsCount; ++i)
-    {
+    for (int i = 0; i < draw_data->CmdListsCount; ++i) {
         const ImDrawList* cmd_list = draw_data->CmdLists[i];
-        for (int j = 0; j < cmd_list->CmdBuffer.Size; ++j)
-        {
+        for (int j = 0; j < cmd_list->CmdBuffer.Size; ++j) {
             const ImDrawCmd& cmd = cmd_list->CmdBuffer[j];
             command_list.Attach(m_program.ps.srv.texture0, *(std::shared_ptr<Resource>*)cmd.TextureId);
             command_list.SetScissorRect(cmd.ClipRect.x, cmd.ClipRect.y, cmd.ClipRect.z, cmd.ClipRect.w);
@@ -148,13 +142,14 @@ void ImGuiPass::OnResize(int width, int height)
 
 void ImGuiPass::OnKey(int key, int action)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL)
-    {
+    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
         ImGuiIO& io = ImGui::GetIO();
-        if (action == GLFW_PRESS)
+        if (action == GLFW_PRESS) {
             io.KeysDown[key] = true;
-        if (action == GLFW_RELEASE)
+        }
+        if (action == GLFW_RELEASE) {
             io.KeysDown[key] = false;
+        }
 
         io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
         io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
@@ -177,8 +172,9 @@ void ImGuiPass::OnMouse(bool first, double xpos, double ypos)
 void ImGuiPass::OnMouseButton(int button, int action)
 {
     ImGuiIO& io = ImGui::GetIO();
-    if (button >= 0 && button < 3)
+    if (button >= 0 && button < 3) {
         io.MouseDown[button] = action == GLFW_PRESS;
+    }
 }
 
 void ImGuiPass::OnScroll(double xoffset, double yoffset)
@@ -194,8 +190,9 @@ void ImGuiPass::OnScroll(double xoffset, double yoffset)
 void ImGuiPass::OnInputChar(unsigned int ch)
 {
     ImGuiIO& io = ImGui::GetIO();
-    if (ch > 0 && ch < 0x10000)
+    if (ch > 0 && ch < 0x10000) {
         io.AddInputCharacter((unsigned short)ch);
+    }
 }
 
 void ImGuiPass::CreateFontsTexture(RenderCommandList& command_list)
@@ -206,7 +203,8 @@ void ImGuiPass::CreateFontsTexture(RenderCommandList& command_list)
     int width, height;
     io.Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 
-    m_font_texture_view = m_device.CreateTexture(BindFlag::kShaderResource | BindFlag::kCopyDest, gli::format::FORMAT_RGBA8_UNORM_PACK8, 1, width, height);
+    m_font_texture_view = m_device.CreateTexture(BindFlag::kShaderResource | BindFlag::kCopyDest,
+                                                 gli::format::FORMAT_RGBA8_UNORM_PACK8, 1, width, height);
     size_t num_bytes = 0;
     size_t row_bytes = 0;
     GetFormatInfo(width, height, gli::format::FORMAT_RGBA8_UNORM_PACK8, num_bytes, row_bytes);

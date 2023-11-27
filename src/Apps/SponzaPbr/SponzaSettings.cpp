@@ -1,6 +1,8 @@
 #include "SponzaSettings.h"
-#include <cmath>
+
 #include <imgui.h>
+
+#include <cmath>
 
 HotKey::HotKey(std::function<void()> on_key)
     : m_on_key(on_key)
@@ -14,42 +16,42 @@ void HotKey::BindKey(int key)
 
 bool HotKey::OnKey(int key)
 {
-    if (m_key == key)
-    {
+    if (m_key == key) {
         m_on_key();
         return true;
     }
     return false;
 }
 
-template<typename T>
-void SponzaSettings::add_combo(const std::string& label, const std::vector<std::string>& items, const std::vector<T>& items_data, T value)
+template <typename T>
+void SponzaSettings::add_combo(const std::string& label,
+                               const std::vector<std::string>& items,
+                               const std::vector<T>& items_data,
+                               T value)
 {
     m_settings[label] = value;
     int index = 0;
-    for (size_t i = 0; i < items_data.size(); ++i)
-    {
-        if (items_data[i] == value)
+    for (size_t i = 0; i < items_data.size(); ++i) {
+        if (items_data[i] == value) {
             index = static_cast<int>(i);
+        }
     }
-    struct Capture
-    {
+    struct Capture {
         std::vector<std::string> items;
     } capture = { items };
-    auto fn = [](void* data, int index, const char** text) -> bool
-    {
-        if (!data || !text || index < 0)
+    auto fn = [](void* data, int index, const char** text) -> bool {
+        if (!data || !text || index < 0) {
             return false;
+        }
         Capture& capture = *static_cast<Capture*>(data);
-        if (index >= capture.items.size())
+        if (index >= capture.items.size()) {
             return false;
+        }
         *text = capture.items[index].c_str();
         return true;
     };
-    m_items.push_back([index, capture, label, fn, items, items_data, this]() mutable
-    {
-        if (ImGui::Combo(label.c_str(), &index, fn, &capture, static_cast<int>(items.size())))
-        {
+    m_items.push_back([index, capture, label, fn, items, items_data, this]() mutable {
+        if (ImGui::Combo(label.c_str(), &index, fn, &capture, static_cast<int>(items.size()))) {
             m_settings[label] = items_data[index];
             return true;
         }
@@ -60,25 +62,20 @@ void SponzaSettings::add_combo(const std::string& label, const std::vector<std::
 HotKey& SponzaSettings::add_checkbox(const std::string& label, bool value)
 {
     m_settings[label] = value;
-    m_items.push_back([this, label]() mutable
-    {
+    m_items.push_back([this, label]() mutable {
         bool value = Get<bool>(label);
         auto res = ImGui::Checkbox(label.c_str(), &value);
         m_settings[label] = value;
         return res;
     });
-    m_hotkeys.emplace_back([this, label]
-    {
-        m_settings[label] = !Get<bool>(label);
-    });
+    m_hotkeys.emplace_back([this, label] { m_settings[label] = !Get<bool>(label); });
     return m_hotkeys.back();
 }
 
 void SponzaSettings::add_slider_int(const std::string& label, int32_t value, int min, int max)
 {
     m_settings[label] = value;
-    m_items.push_back([this, label, min, max]() mutable
-    {
+    m_items.push_back([this, label, min, max]() mutable {
         int32_t value = Get<int32_t>(label);
         auto res = ImGui::SliderInt(label.c_str(), &value, min, max);
         m_settings[label] = value;
@@ -89,20 +86,15 @@ void SponzaSettings::add_slider_int(const std::string& label, int32_t value, int
 void SponzaSettings::add_slider(const std::string& label, float value, float min, float max, bool linear)
 {
     m_settings[label] = value;
-    if (linear)
-    {
-        m_items.push_back([this, label, min, max]() mutable
-        {
+    if (linear) {
+        m_items.push_back([this, label, min, max]() mutable {
             float value = Get<float>(label);
             auto res = ImGui::SliderFloat(label.c_str(), &value, min, max);
             m_settings[label] = value;
             return res;
         });
-    }
-    else
-    {
-        m_items.push_back([this, label, min, max]() mutable
-        {
+    } else {
+        m_items.push_back([this, label, min, max]() mutable {
             float value = Get<float>(label);
             auto res = ImGui::SliderFloat(label.c_str(), &value, min, max, "%.3f", 2);
             m_settings[label] = value;
@@ -115,8 +107,7 @@ SponzaSettings::SponzaSettings()
 {
     std::vector<std::string> sample_count_str = { "Off" };
     std::vector<uint32_t> sample_count = { 1 };
-    for (uint32_t i = 2; i <= 8; i *= 2)
-    {
+    for (uint32_t i = 2; i <= 8; i *= 2) {
         sample_count_str.push_back("x" + std::to_string(i));
         sample_count.push_back(i);
     }
@@ -168,8 +159,7 @@ SponzaSettings::SponzaSettings()
 bool SponzaSettings::OnDraw()
 {
     bool has_changed = false;
-    for (const auto& fn : m_items)
-    {
+    for (const auto& fn : m_items) {
         has_changed |= fn();
     }
     return has_changed;
@@ -177,11 +167,11 @@ bool SponzaSettings::OnDraw()
 
 bool SponzaSettings::OnKey(int key, int action)
 {
-    if (action != GLFW_PRESS)
+    if (action != GLFW_PRESS) {
         return false;
+    }
     bool has_changes = false;
-    for (auto& hotkey : m_hotkeys)
-    {
+    for (auto& hotkey : m_hotkeys) {
         has_changes |= hotkey.OnKey(key);
     }
     return has_changes;

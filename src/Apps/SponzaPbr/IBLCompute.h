@@ -1,25 +1,24 @@
 #pragma once
 
-#include <vector>
-#include <memory>
+#include "Camera/Camera.h"
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
+#include "ProgramRef/Background_PS.h"
+#include "ProgramRef/Background_VS.h"
+#include "ProgramRef/DownSample_CS.h"
+#include "ProgramRef/IBLComputePrePass_PS.h"
+#include "ProgramRef/IBLCompute_PS.h"
+#include "ProgramRef/IBLCompute_VS.h"
 #include "RenderPass.h"
-#include <Device/Device.h>
-#include <Camera/Camera.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/IBLCompute_VS.h>
-#include <ProgramRef/IBLCompute_PS.h>
-#include <ProgramRef/IBLComputePrePass_PS.h>
-#include <ProgramRef/DownSample_CS.h>
-#include <ProgramRef/Background_PS.h>
-#include <ProgramRef/Background_VS.h>
-#include "SponzaSettings.h"
 #include "ShadowPass.h"
+#include "SponzaSettings.h"
 
-class IBLCompute : public IPass
-{
+#include <memory>
+#include <vector>
+
+class IBLCompute : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         ShadowPass::Output& shadow_pass;
         SceneModels& scene_list;
         const Camera& camera;
@@ -28,8 +27,7 @@ public:
         std::shared_ptr<Resource>& environment;
     };
 
-    struct Output
-    {
+    struct Output {
     } output;
 
     IBLCompute(RenderDevice& device, const Input& input);

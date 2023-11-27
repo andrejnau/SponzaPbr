@@ -10,17 +10,15 @@ GeometryPass::GeometryPass(RenderDevice& device, const Input& input, int width, 
     , m_program(device)
 {
     CreateSizeDependentResources();
-    m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever });
+    m_sampler = m_device.CreateSampler(
+        { SamplerFilter::kAnisotropic, SamplerTextureAddressMode::kWrap, SamplerComparisonFunc::kNever });
 }
 
 void GeometryPass::OnUpdate()
 {
     glm::mat4 projection, view, model;
     m_input.camera.GetMatrix(projection, view, model);
-    
+
     m_program.vs.cbuffer.ConstantBuf.view = glm::transpose(view);
     m_program.vs.cbuffer.ConstantBuf.projection = glm::transpose(projection);
 }
@@ -49,10 +47,8 @@ void GeometryPass::OnRender(RenderCommandList& command_list)
 
     bool skiped = false;
     command_list.BeginRenderPass(render_pass_desc);
-    for (auto& model : m_input.scene_list)
-    {
-        if (!skiped && m_settings.Get<bool>("skip_sponza_model"))
-        {
+    for (auto& model : m_input.scene_list) {
+        if (!skiped && m_settings.Get<bool>("skip_sponza_model")) {
             skiped = true;
             continue;
         }
@@ -66,12 +62,13 @@ void GeometryPass::OnRender(RenderCommandList& command_list)
         model.ia.texcoords.BindToSlot(command_list, m_program.vs.ia.TEXCOORD);
         model.ia.tangents.BindToSlot(command_list, m_program.vs.ia.TANGENT);
 
-        for (auto& range : model.ia.ranges)
-        {
+        for (auto& range : model.ia.ranges) {
             auto& material = model.GetMaterial(range.id);
 
-            m_program.ps.cbuffer.Settings.use_normal_mapping = material.texture.normal && m_settings.Get<bool>("normal_mapping");
-            m_program.ps.cbuffer.Settings.use_gloss_instead_of_roughness = material.texture.glossiness && !material.texture.roughness;
+            m_program.ps.cbuffer.Settings.use_normal_mapping =
+                material.texture.normal && m_settings.Get<bool>("normal_mapping");
+            m_program.ps.cbuffer.Settings.use_gloss_instead_of_roughness =
+                material.texture.glossiness && !material.texture.roughness;
             m_program.ps.cbuffer.Settings.use_flip_normal_y = m_settings.Get<bool>("use_flip_normal_y");
 
             command_list.Attach(m_program.ps.srv.normalMap, material.texture.normal);
@@ -99,17 +96,25 @@ void GeometryPass::OnModifySponzaSettings(const SponzaSettings& settings)
 {
     SponzaSettings prev = m_settings;
     m_settings = settings;
-    if (prev.Get<uint32_t>("sample_count") != m_settings.Get<uint32_t>("sample_count"))
-    {
+    if (prev.Get<uint32_t>("sample_count") != m_settings.Get<uint32_t>("sample_count")) {
         CreateSizeDependentResources();
     }
 }
 
 void GeometryPass::CreateSizeDependentResources()
 {
-    output.position = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource, gli::format::FORMAT_RGBA32_SFLOAT_PACK32, m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
-    output.normal = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource, gli::format::FORMAT_RGBA32_SFLOAT_PACK32, m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
-    output.albedo = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource, gli::format::FORMAT_RGBA32_SFLOAT_PACK32, m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
-    output.material = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource, gli::format::FORMAT_RGBA32_SFLOAT_PACK32, m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
-    output.dsv = m_device.CreateTexture(BindFlag::kDepthStencil, gli::format::FORMAT_D32_SFLOAT_PACK32, m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
+    output.position = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource,
+                                             gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+                                             m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
+    output.normal = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource,
+                                           gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+                                           m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
+    output.albedo = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource,
+                                           gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+                                           m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
+    output.material = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource,
+                                             gli::format::FORMAT_RGBA32_SFLOAT_PACK32,
+                                             m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
+    output.dsv = m_device.CreateTexture(BindFlag::kDepthStencil, gli::format::FORMAT_D32_SFLOAT_PACK32,
+                                        m_settings.Get<uint32_t>("sample_count"), m_width, m_height, 1);
 }

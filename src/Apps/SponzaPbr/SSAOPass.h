@@ -1,33 +1,30 @@
 #pragma once
 
+#include "Camera/Camera.h"
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "GeometryPass.h"
+#include "ProgramRef/SSAOBlurPass_PS.h"
+#include "ProgramRef/SSAOPass_PS.h"
+#include "ProgramRef/SSAOPass_VS.h"
 #include "SponzaSettings.h"
-#include <Device/Device.h>
-#include <Camera/Camera.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/SSAOPass_PS.h>
-#include <ProgramRef/SSAOPass_VS.h>
-#include <ProgramRef/SSAOBlurPass_PS.h>
 
-class SSAOPass : public IPass
-{
+class SSAOPass : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         GeometryPass::Output& geometry_pass;
         Model& square;
         const Camera& camera;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> ao;
     } output;
 
     SSAOPass(RenderDevice& device, RenderCommandList& command_list, const Input& input, int width, int height);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnResize(int width, int height) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 

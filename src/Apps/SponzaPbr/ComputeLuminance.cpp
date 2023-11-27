@@ -1,4 +1,5 @@
 #include "ComputeLuminance.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -14,11 +15,12 @@ ComputeLuminance::ComputeLuminance(RenderDevice& device, const Input& input, int
     CreateBuffers();
 }
 
-void ComputeLuminance::OnUpdate()
-{
-}
+void ComputeLuminance::OnUpdate() {}
 
-void ComputeLuminance::GetLum2DPass_CS(RenderCommandList& command_list, size_t buf_id, uint32_t thread_group_x, uint32_t thread_group_y)
+void ComputeLuminance::GetLum2DPass_CS(RenderCommandList& command_list,
+                                       size_t buf_id,
+                                       uint32_t thread_group_x,
+                                       uint32_t thread_group_y)
 {
     m_HDRLum2DPass_CS.cs.cbuffer.cb.dispatchSize = glm::uvec2(thread_group_x, thread_group_y);
     command_list.UseProgram(m_HDRLum2DPass_CS);
@@ -29,7 +31,10 @@ void ComputeLuminance::GetLum2DPass_CS(RenderCommandList& command_list, size_t b
     command_list.Dispatch(thread_group_x, thread_group_y, 1);
 }
 
-void ComputeLuminance::GetLum1DPass_CS(RenderCommandList& command_list, size_t buf_id, uint32_t input_buffer_size, uint32_t thread_group_x)
+void ComputeLuminance::GetLum1DPass_CS(RenderCommandList& command_list,
+                                       size_t buf_id,
+                                       uint32_t input_buffer_size,
+                                       uint32_t thread_group_x)
 {
     m_HDRLum1DPass_CS.cs.cbuffer.cb.bufferSize = input_buffer_size;
     command_list.UseProgram(m_HDRLum1DPass_CS);
@@ -69,8 +74,7 @@ void ComputeLuminance::Draw(RenderCommandList& command_list, size_t buf_id)
     m_input.model.ia.texcoords.BindToSlot(command_list, m_HDRApply.vs.ia.TEXCOORD);
 
     command_list.BeginRenderPass(render_pass_desc);
-    for (auto& range : m_input.model.ia.ranges)
-    {
+    for (auto& range : m_input.model.ia.ranges) {
         command_list.Attach(m_HDRApply.ps.srv.hdr_input, m_input.hdr_res);
         command_list.Attach(m_HDRApply.ps.srv.lum, m_use_res[buf_id]);
         command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
@@ -82,19 +86,15 @@ void ComputeLuminance::OnRender(RenderCommandList& command_list)
 {
     command_list.SetViewport(0, 0, m_width, m_height);
     size_t buf_id = 0;
-    if (m_settings.Get<bool>("use_tone_mapping"))
-    {
+    if (m_settings.Get<bool>("use_tone_mapping")) {
         GetLum2DPass_CS(command_list, buf_id, m_thread_group_x, m_thread_group_y);
-        for (int block_size = m_thread_group_x * m_thread_group_y; block_size > 1;)
-        {
+        for (int block_size = m_thread_group_x * m_thread_group_y; block_size > 1;) {
             uint32_t next_block_size = (block_size + 127) / 128;
             GetLum1DPass_CS(command_list, ++buf_id, block_size, next_block_size);
             block_size = next_block_size;
         }
         Draw(command_list, buf_id);
-    }
-    else
-    {
+    } else {
         Draw(command_list, buf_id);
     }
 }
@@ -112,13 +112,14 @@ void ComputeLuminance::CreateBuffers()
     m_thread_group_x = (m_width + 31) / 32;
     m_thread_group_y = (m_height + 31) / 32;
     uint32_t total_invoke = m_thread_group_x * m_thread_group_y;
-    std::shared_ptr<Resource> buffer = m_device.CreateBuffer(BindFlag::kUnorderedAccess | BindFlag::kShaderResource, sizeof(float) * total_invoke);
+    std::shared_ptr<Resource> buffer =
+        m_device.CreateBuffer(BindFlag::kUnorderedAccess | BindFlag::kShaderResource, sizeof(float) * total_invoke);
     m_use_res.push_back(buffer);
 
-    for (int block_size = m_thread_group_x * m_thread_group_y; block_size > 1;)
-    {
+    for (int block_size = m_thread_group_x * m_thread_group_y; block_size > 1;) {
         uint32_t next_block_size = (block_size + 127) / 128;
-        std::shared_ptr<Resource> buffer = m_device.CreateBuffer(BindFlag::kUnorderedAccess | BindFlag::kShaderResource, sizeof(float) * next_block_size);
+        std::shared_ptr<Resource> buffer = m_device.CreateBuffer(BindFlag::kUnorderedAccess | BindFlag::kShaderResource,
+                                                                 sizeof(float) * next_block_size);
         m_use_res.push_back(buffer);
         block_size = next_block_size;
     }

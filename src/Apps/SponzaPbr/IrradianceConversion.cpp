@@ -1,4 +1,5 @@
 #include "IrradianceConversion.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -11,20 +12,21 @@ IrradianceConversion::IrradianceConversion(RenderDevice& device, const Input& in
     m_sampler = m_device.CreateSampler({
         SamplerFilter::kAnisotropic,
         SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever
+        SamplerComparisonFunc::kNever,
     });
 }
 
 void IrradianceConversion::OnUpdate()
 {
-    m_program_irradiance_convolution.vs.cbuffer.ConstantBuf.projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
-    m_program_prefilter.vs.cbuffer.ConstantBuf.projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
+    m_program_irradiance_convolution.vs.cbuffer.ConstantBuf.projection =
+        glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
+    m_program_prefilter.vs.cbuffer.ConstantBuf.projection =
+        glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, 0.1f, 10.0f));
 }
 
 void IrradianceConversion::OnRender(RenderCommandList& command_list)
 {
-    if (!is || m_settings.Get<bool>("irradiance_conversion_every_frame"))
-    {
+    if (!is || m_settings.Get<bool>("irradiance_conversion_every_frame")) {
         command_list.BeginEvent("DrawIrradianceConvolution");
         DrawIrradianceConvolution(command_list);
         command_list.EndEvent();
@@ -42,7 +44,8 @@ void IrradianceConversion::DrawIrradianceConvolution(RenderCommandList& command_
     command_list.SetViewport(0, 0, m_input.irradince.size, m_input.irradince.size);
 
     command_list.UseProgram(m_program_irradiance_convolution);
-    command_list.Attach(m_program_irradiance_convolution.vs.cbv.ConstantBuf, m_program_irradiance_convolution.vs.cbuffer.ConstantBuf);
+    command_list.Attach(m_program_irradiance_convolution.vs.cbv.ConstantBuf,
+                        m_program_irradiance_convolution.vs.cbuffer.ConstantBuf);
 
     command_list.Attach(m_program_irradiance_convolution.ps.sampler.g_sampler, m_sampler);
 
@@ -67,24 +70,18 @@ void IrradianceConversion::DrawIrradianceConvolution(RenderCommandList& command_
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    glm::mat4 capture_views[] =
-    {
-        glm::lookAt(position, position + Right, Up),
-        glm::lookAt(position, position + Left, Up),
-        glm::lookAt(position, position + Up, BackwardRH),
-        glm::lookAt(position, position + Down, ForwardRH),
-        glm::lookAt(position, position + BackwardLH, Up),
-        glm::lookAt(position, position + ForwardLH, Up)
+    glm::mat4 capture_views[] = {
+        glm::lookAt(position, position + Right, Up),      glm::lookAt(position, position + Left, Up),
+        glm::lookAt(position, position + Up, BackwardRH), glm::lookAt(position, position + Down, ForwardRH),
+        glm::lookAt(position, position + BackwardLH, Up), glm::lookAt(position, position + ForwardLH, Up),
     };
 
     command_list.BeginRenderPass(render_pass_desc);
-    for (uint32_t i = 0; i < 6; ++i)
-    {
+    for (uint32_t i = 0; i < 6; ++i) {
         m_program_irradiance_convolution.vs.cbuffer.ConstantBuf.face = 6 * m_input.irradince.layer + i;
         m_program_irradiance_convolution.vs.cbuffer.ConstantBuf.view = glm::transpose(capture_views[i]);
         command_list.Attach(m_program_irradiance_convolution.ps.srv.environmentMap, m_input.environment);
-        for (auto& range : m_input.model.ia.ranges)
-        {
+        for (auto& range : m_input.model.ia.ranges) {
             command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
         }
     }
@@ -113,19 +110,14 @@ void IrradianceConversion::DrawPrefilter(RenderCommandList& command_list)
 
     glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    glm::mat4 capture_views[] =
-    {
-        glm::lookAt(position, position + Right, Up),
-        glm::lookAt(position, position + Left, Up),
-        glm::lookAt(position, position + Up, BackwardRH),
-        glm::lookAt(position, position + Down, ForwardRH),
-        glm::lookAt(position, position + BackwardLH, Up),
-        glm::lookAt(position, position + ForwardLH, Up)
+    glm::mat4 capture_views[] = {
+        glm::lookAt(position, position + Right, Up),      glm::lookAt(position, position + Left, Up),
+        glm::lookAt(position, position + Up, BackwardRH), glm::lookAt(position, position + Down, ForwardRH),
+        glm::lookAt(position, position + BackwardLH, Up), glm::lookAt(position, position + ForwardLH, Up),
     };
 
     size_t max_mip_levels = log2(m_input.prefilter.size);
-    for (size_t mip = 0; mip < max_mip_levels; ++mip)
-    {
+    for (size_t mip = 0; mip < max_mip_levels; ++mip) {
         command_list.BeginEvent(std::string("DrawPrefilter: mip " + std::to_string(mip)).c_str());
         command_list.SetViewport(0, 0, m_input.prefilter.size >> mip, m_input.prefilter.size >> mip);
         m_program_prefilter.ps.cbuffer.Settings.roughness = (float)mip / (float)(max_mip_levels - 1);
@@ -141,15 +133,15 @@ void IrradianceConversion::DrawPrefilter(RenderCommandList& command_list)
         render_pass_desc.depth_stencil.clear_depth = 1.0f;
 
         command_list.BeginRenderPass(render_pass_desc);
-        for (uint32_t i = 0; i < 6; ++i)
-        {
-            command_list.BeginEvent(std::string("DrawPrefilter: mip " + std::to_string(mip) + " level " + std::to_string(i)).c_str());
+        for (uint32_t i = 0; i < 6; ++i) {
+            command_list.BeginEvent(
+                std::string("DrawPrefilter: mip " + std::to_string(mip) + " level " + std::to_string(i)).c_str());
             m_program_prefilter.vs.cbuffer.ConstantBuf.face = 6 * m_input.prefilter.layer + i;
             m_program_prefilter.vs.cbuffer.ConstantBuf.view = glm::transpose(capture_views[i]);
             command_list.Attach(m_program_prefilter.ps.srv.environmentMap, m_input.environment);
-            for (auto& range : m_input.model.ia.ranges)
-            {
-                command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
+            for (auto& range : m_input.model.ia.ranges) {
+                command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location,
+                                         0);
             }
             command_list.EndEvent();
         }

@@ -1,32 +1,29 @@
 #pragma once
 
+#include "Camera/Camera.h"
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
+#include "ProgramRef/ShadowPass_PS.h"
+#include "ProgramRef/ShadowPass_VS.h"
 #include "RenderPass.h"
-#include <Device/Device.h>
-#include <Camera/Camera.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/ShadowPass_VS.h>
-#include <ProgramRef/ShadowPass_PS.h>
 #include "SponzaSettings.h"
 
-class ShadowPass : public IPass
-{
+class ShadowPass : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         SceneModels& scene_list;
         const Camera& camera;
         glm::vec3& light_pos;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> srv;
     } output;
 
     ShadowPass(RenderDevice& device, const Input& input);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 
 private:

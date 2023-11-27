@@ -1,39 +1,33 @@
 #pragma once
-#include <RenderDevice/RenderDevice.h>
-#include <Geometry/Geometry.h>
-#include <string>
-
-#include <ProgramRef/GeometryPass_PS.h>
-#include <ProgramRef/GeometryPass_VS.h>
-#include <ProgramRef/LightPass_PS.h>
-#include <ProgramRef/LightPass_VS.h>
-
-#include "SkinningPass.h"
-#include "GeometryPass.h"
-#include "LightPass.h"
-#include "ImGuiPass.h"
-#include "SSAOPass.h"
-#include "ComputeLuminance.h"
-#include "SponzaSettings.h"
-#include "IrradianceConversion.h"
-#include "BackgroundPass.h"
-#include "ShadowPass.h"
-#include "IBLCompute.h"
 #include "BRDFGen.h"
+#include "BackgroundPass.h"
+#include "Camera/Camera.h"
+#include "ComputeLuminance.h"
 #include "Equirectangular2Cubemap.h"
-
+#include "Geometry/Geometry.h"
+#include "GeometryPass.h"
+#include "IBLCompute.h"
+#include "ImGuiPass.h"
+#include "IrradianceConversion.h"
+#include "LightPass.h"
+#include "ProgramRef/GeometryPass_PS.h"
+#include "ProgramRef/GeometryPass_VS.h"
+#include "ProgramRef/LightPass_PS.h"
+#include "ProgramRef/LightPass_VS.h"
 #include "RayTracingAOPass.h"
+#include "RenderDevice/RenderDevice.h"
+#include "SSAOPass.h"
+#include "ShadowPass.h"
+#include "SkinningPass.h"
+#include "SponzaSettings.h"
 
-#include <Camera/Camera.h>
 #include <glm/glm.hpp>
-#include <vector>
-#include <map>
 
-class Scene
-    : public InputEvents
-    , public WindowEvents
-    , public IModifySponzaSettings
-{
+#include <map>
+#include <string>
+#include <vector>
+
+class Scene : public InputEvents, public WindowEvents, public IModifySponzaSettings {
 public:
     Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLFWwindow* window, int width, int height);
     ~Scene();
@@ -94,8 +88,7 @@ private:
     SponzaSettings m_settings;
     size_t m_irradince_texture_size = 16;
     size_t m_prefilter_texture_size = 512;
-    struct PassDesc
-    {
+    struct PassDesc {
         std::string name;
         std::reference_wrapper<IPass> pass;
     };

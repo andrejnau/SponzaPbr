@@ -1,29 +1,26 @@
 #pragma once
 
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "GeometryPass.h"
+#include "ProgramRef/BRDF_PS.h"
+#include "ProgramRef/BRDF_VS.h"
 #include "SponzaSettings.h"
-#include <Device/Device.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/BRDF_PS.h>
-#include <ProgramRef/BRDF_VS.h>
 
-class BRDFGen : public IPass
-{
+class BRDFGen : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         Model& square_model;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> brdf;
     } output;
 
     BRDFGen(RenderDevice& device, const Input& input);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnResize(int width, int height) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 

@@ -1,4 +1,5 @@
 #include "LightPass.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -13,23 +14,27 @@ LightPass::LightPass(RenderDevice& device, const Input& input, int width, int he
     m_sampler = m_device.CreateSampler({
         SamplerFilter::kAnisotropic,
         SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever });
+        SamplerComparisonFunc::kNever,
+    });
 
     m_sampler_brdf = m_device.CreateSampler({
         SamplerFilter::kMinMagMipLinear,
         SamplerTextureAddressMode::kClamp,
-        SamplerComparisonFunc::kNever });
+        SamplerComparisonFunc::kNever,
+    });
 
     m_compare_sampler = m_device.CreateSampler({
         SamplerFilter::kComparisonMinMagMipLinear,
         SamplerTextureAddressMode::kClamp,
-        SamplerComparisonFunc::kLess });
+        SamplerComparisonFunc::kLess,
+    });
 }
 
 void LightPass::SetDefines(ProgramHolder<LightPass_PS, LightPass_VS>& program)
 {
-    if (m_settings.Get<uint32_t>("sample_count") != 1)
+    if (m_settings.Get<uint32_t>("sample_count") != 1) {
         program.ps.desc.define["SAMPLE_COUNT"] = std::to_string(m_settings.Get<uint32_t>("sample_count"));
+    }
 }
 
 void LightPass::OnUpdate()
@@ -44,7 +49,8 @@ void LightPass::OnUpdate()
     m_program.ps.cbuffer.Settings.only_ambient = m_settings.Get<bool>("only_ambient");
     m_program.ps.cbuffer.Settings.ambient_power = m_settings.Get<float>("ambient_power");
     m_program.ps.cbuffer.Settings.light_power = m_settings.Get<float>("light_power");
-    m_program.ps.cbuffer.Settings.use_spec_ao_by_ndotv_roughness = m_settings.Get<bool>("use_spec_ao_by_ndotv_roughness");
+    m_program.ps.cbuffer.Settings.use_spec_ao_by_ndotv_roughness =
+        m_settings.Get<bool>("use_spec_ao_by_ndotv_roughness");
     m_program.ps.cbuffer.Settings.show_only_position = m_settings.Get<bool>("show_only_position");
     m_program.ps.cbuffer.Settings.show_only_albedo = m_settings.Get<bool>("show_only_albedo");
     m_program.ps.cbuffer.Settings.show_only_normal = m_settings.Get<bool>("show_only_normal");
@@ -59,33 +65,30 @@ void LightPass::OnUpdate()
     m_program.ps.cbuffer.ShadowParams.use_shadow = m_settings.Get<bool>("use_shadow");
     m_program.ps.cbuffer.ShadowParams.shadow_light_pos = m_input.light_pos;
 
-    for (size_t i = 0; i < std::size(m_program.ps.cbuffer.Light.light_pos); ++i)
-    {
+    for (size_t i = 0; i < std::size(m_program.ps.cbuffer.Light.light_pos); ++i) {
         m_program.ps.cbuffer.Light.light_pos[i] = glm::vec4(0);
         m_program.ps.cbuffer.Light.light_color[i] = glm::vec4(0);
     }
 
     m_program.ps.cbuffer.Light.light_count = 0;
-    if (m_settings.Get<bool>("light_in_camera"))
-    {
+    if (m_settings.Get<bool>("light_in_camera")) {
         m_program.ps.cbuffer.Light.light_pos[m_program.ps.cbuffer.Light.light_count] = glm::vec4(camera_position, 0);
         m_program.ps.cbuffer.Light.light_color[m_program.ps.cbuffer.Light.light_count] = glm::vec4(1, 1, 1, 0.0);
         ++m_program.ps.cbuffer.Light.light_count;
     }
-    if (m_settings.Get<bool>("additional_lights"))
-    {
-        for (int x = -13; x <= 13; ++x)
-        {
+    if (m_settings.Get<bool>("additional_lights")) {
+        for (int x = -13; x <= 13; ++x) {
             int q = 1;
-            for (int z = -1; z <= 1; ++z)
-            {
-                if (m_program.ps.cbuffer.Light.light_count < std::size(m_program.ps.cbuffer.Light.light_pos))
-                {
-                    m_program.ps.cbuffer.Light.light_pos[m_program.ps.cbuffer.Light.light_count] = glm::vec4(x, 1.5, z - 0.33, 0);
+            for (int z = -1; z <= 1; ++z) {
+                if (m_program.ps.cbuffer.Light.light_count < std::size(m_program.ps.cbuffer.Light.light_pos)) {
+                    m_program.ps.cbuffer.Light.light_pos[m_program.ps.cbuffer.Light.light_count] =
+                        glm::vec4(x, 1.5, z - 0.33, 0);
                     float color = 0.0;
-                    if (m_settings.Get<bool>("use_white_ligth"))
+                    if (m_settings.Get<bool>("use_white_ligth")) {
                         color = 1;
-                    m_program.ps.cbuffer.Light.light_color[m_program.ps.cbuffer.Light.light_count] = glm::vec4(q == 1 ? 1 : color, q == 2 ? 1 : color, q == 3 ? 1 : color, 0.0);
+                    }
+                    m_program.ps.cbuffer.Light.light_color[m_program.ps.cbuffer.Light.light_count] =
+                        glm::vec4(q == 1 ? 1 : color, q == 2 ? 1 : color, q == 3 ? 1 : color, 0.0);
                     ++m_program.ps.cbuffer.Light.light_count;
                     ++q;
                 }
@@ -122,20 +125,21 @@ void LightPass::OnRender(RenderCommandList& command_list)
     render_pass_desc.depth_stencil.clear_depth = 1.0f;
 
     command_list.BeginRenderPass(render_pass_desc);
-    for (auto& range : m_input.model.ia.ranges)
-    {
+    for (auto& range : m_input.model.ia.ranges) {
         command_list.Attach(m_program.ps.srv.gNormal, m_input.geometry_pass.normal);
         command_list.Attach(m_program.ps.srv.gAlbedo, m_input.geometry_pass.albedo);
         command_list.Attach(m_program.ps.srv.gMaterial, m_input.geometry_pass.material);
-        if (m_settings.Get<bool>("use_rtao") && m_input.ray_tracing_ao)
+        if (m_settings.Get<bool>("use_rtao") && m_input.ray_tracing_ao) {
             command_list.Attach(m_program.ps.srv.gSSAO, *m_input.ray_tracing_ao);
-        else if (m_settings.Get<bool>("use_ssao"))
+        } else if (m_settings.Get<bool>("use_ssao")) {
             command_list.Attach(m_program.ps.srv.gSSAO, m_input.ssao_pass.ao);
+        }
         command_list.Attach(m_program.ps.srv.irradianceMap, m_input.irradince);
         command_list.Attach(m_program.ps.srv.prefilterMap, m_input.prefilter);
         command_list.Attach(m_program.ps.srv.brdfLUT, m_input.brdf);
-        if (m_settings.Get<bool>("use_shadow"))
+        if (m_settings.Get<bool>("use_shadow")) {
             command_list.Attach(m_program.ps.srv.LightCubeShadowMap, m_input.shadow_pass.srv);
+        }
 
         command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
     }
@@ -151,16 +155,17 @@ void LightPass::OnResize(int width, int height)
 
 void LightPass::CreateSizeDependentResources()
 {
-    output.rtv = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource, gli::format::FORMAT_RGBA32_SFLOAT_PACK32, 1, m_width, m_height, 1);
-    m_depth_stencil_view = m_device.CreateTexture(BindFlag::kDepthStencil, gli::format::FORMAT_D32_SFLOAT_PACK32, 1, m_width, m_height, 1);
+    output.rtv = m_device.CreateTexture(BindFlag::kRenderTarget | BindFlag::kShaderResource,
+                                        gli::format::FORMAT_RGBA32_SFLOAT_PACK32, 1, m_width, m_height, 1);
+    m_depth_stencil_view =
+        m_device.CreateTexture(BindFlag::kDepthStencil, gli::format::FORMAT_D32_SFLOAT_PACK32, 1, m_width, m_height, 1);
 }
 
 void LightPass::OnModifySponzaSettings(const SponzaSettings& settings)
 {
     SponzaSettings prev = m_settings;
     m_settings = settings;
-    if (prev.Get<uint32_t>("sample_count") != m_settings.Get<uint32_t>("sample_count"))
-    {
+    if (prev.Get<uint32_t>("sample_count") != m_settings.Get<uint32_t>("sample_count")) {
         m_program.ps.desc.define["SAMPLE_COUNT"] = std::to_string(m_settings.Get<uint32_t>("sample_count"));
         m_program.UpdateProgram();
     }

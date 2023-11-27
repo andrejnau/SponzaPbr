@@ -1,24 +1,21 @@
 #pragma once
 
-#include "SponzaSettings.h"
+#include "Camera/Camera.h"
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
+#include "ProgramRef/GeometryPass_PS.h"
+#include "ProgramRef/GeometryPass_VS.h"
 #include "RenderPass.h"
-#include <Device/Device.h>
-#include <Camera/Camera.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/GeometryPass_PS.h>
-#include <ProgramRef/GeometryPass_VS.h>
+#include "SponzaSettings.h"
 
-class GeometryPass : public IPass
-{
+class GeometryPass : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         SceneModels& scene_list;
         const Camera& camera;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> position;
         std::shared_ptr<Resource> normal;
         std::shared_ptr<Resource> albedo;
@@ -29,7 +26,7 @@ public:
     GeometryPass(RenderDevice& device, const Input& input, int width, int height);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnResize(int width, int height) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 

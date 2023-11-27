@@ -1,4 +1,5 @@
 #include "BackgroundPass.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -12,8 +13,8 @@ BackgroundPass::BackgroundPass(RenderDevice& device, const Input& input, int wid
     m_sampler = m_device.CreateSampler({
         SamplerFilter::kAnisotropic,
         SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever }
-    );
+        SamplerComparisonFunc::kNever,
+    });
 }
 
 void BackgroundPass::OnUpdate()
@@ -46,8 +47,7 @@ void BackgroundPass::OnRender(RenderCommandList& command_list)
     command_list.Attach(m_program.ps.srv.environmentMap, m_input.environment);
 
     command_list.BeginRenderPass(render_pass_desc);
-    for (auto& range : m_input.model.ia.ranges)
-    {
+    for (auto& range : m_input.model.ia.ranges) {
         command_list.DrawIndexed(range.index_count, 1, range.start_index_location, range.base_vertex_location, 0);
     }
     command_list.EndRenderPass();

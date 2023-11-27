@@ -1,33 +1,35 @@
 #pragma once
 
-#include <imgui.h>
-#include "RenderPass.h"
-#include <Device/Device.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/ImGuiPass_PS.h>
-#include <ProgramRef/ImGuiPass_VS.h>
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "ImGuiSettings.h"
+#include "ProgramRef/ImGuiPass_PS.h"
+#include "ProgramRef/ImGuiPass_VS.h"
+#include "RenderPass.h"
 
-class ImGuiPass : public IPass
-                , public InputEvents
-{
+#include <imgui.h>
+
+class ImGuiPass : public IPass, public InputEvents {
 public:
-    struct Input
-    {
+    struct Input {
         std::shared_ptr<Resource>& rtv;
         IModifySponzaSettings& root_scene;
         SponzaSettings& settings;
     };
 
-    struct Output
-    {
+    struct Output {
     } output;
 
-    ImGuiPass(RenderDevice& device, RenderCommandList& command_list, const Input& input, int width, int height, GLFWwindow* window);
+    ImGuiPass(RenderDevice& device,
+              RenderCommandList& command_list,
+              const Input& input,
+              int width,
+              int height,
+              GLFWwindow* window);
     ~ImGuiPass();
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnResize(int width, int height) override;
 
     virtual void OnKey(int key, int action) override;

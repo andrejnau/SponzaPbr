@@ -1,17 +1,15 @@
 #pragma once
 
+#include "Device/Device.h"
+#include "Geometry/Geometry.h"
 #include "GeometryPass.h"
+#include "ProgramRef/Background_PS.h"
+#include "ProgramRef/Background_VS.h"
 #include "SponzaSettings.h"
-#include <Device/Device.h>
-#include <Geometry/Geometry.h>
-#include <ProgramRef/Background_PS.h>
-#include <ProgramRef/Background_VS.h>
 
-class BackgroundPass : public IPass
-{
+class BackgroundPass : public IPass {
 public:
-    struct Input
-    {
+    struct Input {
         Model& model;
         const Camera& camera;
         std::shared_ptr<Resource>& environment;
@@ -19,8 +17,7 @@ public:
         std::shared_ptr<Resource>& dsv;
     };
 
-    struct Output
-    {
+    struct Output {
         std::shared_ptr<Resource> environment;
         std::shared_ptr<Resource> irradince;
     } output;
@@ -28,7 +25,7 @@ public:
     BackgroundPass(RenderDevice& device, const Input& input, int width, int height);
 
     virtual void OnUpdate() override;
-    virtual void OnRender(RenderCommandList& command_list)override;
+    virtual void OnRender(RenderCommandList& command_list) override;
     virtual void OnResize(int width, int height) override;
     virtual void OnModifySponzaSettings(const SponzaSettings& settings) override;
 

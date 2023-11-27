@@ -1,4 +1,5 @@
 #include "ShadowPass.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -11,7 +12,8 @@ ShadowPass::ShadowPass(RenderDevice& device, const Input& input)
     m_sampler = m_device.CreateSampler({
         SamplerFilter::kAnisotropic,
         SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever });
+        SamplerComparisonFunc::kNever,
+    });
 }
 
 void ShadowPass::OnUpdate()
@@ -27,7 +29,8 @@ void ShadowPass::OnUpdate()
 
     glm::vec3 position = m_input.light_pos;
 
-    m_program.vs.cbuffer.VSParams.Projection = glm::transpose(glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
+    m_program.vs.cbuffer.VSParams.Projection = glm::transpose(
+        glm::perspective(glm::radians(90.0f), 1.0f, m_settings.Get<float>("s_near"), m_settings.Get<float>("s_far")));
 
     std::array<glm::mat4, 6>& view = m_program.vs.cbuffer.VSParams.View;
     view[0] = glm::transpose(glm::lookAt(position, position + Right, Up));
@@ -40,8 +43,9 @@ void ShadowPass::OnUpdate()
 
 void ShadowPass::OnRender(RenderCommandList& command_list)
 {
-    if (!m_settings.Get<bool>("use_shadow"))
+    if (!m_settings.Get<bool>("use_shadow")) {
         return;
+    }
 
     command_list.SetViewport(0, 0, m_settings.Get<float>("s_size"), m_settings.Get<float>("s_size"));
 
@@ -55,8 +59,7 @@ void ShadowPass::OnRender(RenderCommandList& command_list)
     render_pass_desc.depth_stencil.clear_depth = 1.0f;
 
     command_list.BeginRenderPass(render_pass_desc);
-    for (auto& model : m_input.scene_list)
-    {
+    for (auto& model : m_input.scene_list) {
         m_program.vs.cbuffer.VSParams.World = glm::transpose(model.matrix);
 
         command_list.SetRasterizeState({ FillMode::kSolid, CullMode::kBack, 4096 });
@@ -65,14 +68,14 @@ void ShadowPass::OnRender(RenderCommandList& command_list)
         model.ia.positions.BindToSlot(command_list, m_program.vs.ia.SV_POSITION);
         model.ia.texcoords.BindToSlot(command_list, m_program.vs.ia.TEXCOORD);
 
-        for (auto& range : model.ia.ranges)
-        {
+        for (auto& range : model.ia.ranges) {
             auto& material = model.GetMaterial(range.id);
 
-            if (m_settings.Get<bool>("shadow_discard"))
+            if (m_settings.Get<bool>("shadow_discard")) {
                 command_list.Attach(m_program.ps.srv.alphaMap, material.texture.opacity);
-            else
+            } else {
                 command_list.Attach(m_program.ps.srv.alphaMap);
+            }
 
             command_list.DrawIndexed(range.index_count, 6, range.start_index_location, range.base_vertex_location, 0);
         }
@@ -82,15 +85,16 @@ void ShadowPass::OnRender(RenderCommandList& command_list)
 
 void ShadowPass::CreateSizeDependentResources()
 {
-    output.srv = m_device.CreateTexture(BindFlag::kDepthStencil | BindFlag::kShaderResource, gli::format::FORMAT_D32_SFLOAT_PACK32, 1, m_settings.Get<float>("s_size"), m_settings.Get<float>("s_size"), 6);
+    output.srv = m_device.CreateTexture(BindFlag::kDepthStencil | BindFlag::kShaderResource,
+                                        gli::format::FORMAT_D32_SFLOAT_PACK32, 1, m_settings.Get<float>("s_size"),
+                                        m_settings.Get<float>("s_size"), 6);
 }
 
 void ShadowPass::OnModifySponzaSettings(const SponzaSettings& settings)
 {
     SponzaSettings prev = m_settings;
     m_settings = settings;
-    if (prev.Get<float>("s_size") != m_settings.Get<float>("s_size"))
-    {
+    if (prev.Get<float>("s_size") != m_settings.Get<float>("s_size")) {
         CreateSizeDependentResources();
     }
 }
