@@ -4,3 +4,4 @@
 [submodule "3rdparty/FlyWrapper"]
 	path = 3rdparty/FlyWrapper
 	url = https://github.com/andrejnau/FlyWrapper.git
+	branch = master
