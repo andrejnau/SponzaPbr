@@ -141,7 +141,6 @@ target_link_libraries(${target}
     AppBox
     Geometry
     Camera
-    Utilities
     Texture
     imgui
     SponzaPbrAssets

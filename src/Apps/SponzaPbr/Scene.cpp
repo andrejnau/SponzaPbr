@@ -61,7 +61,7 @@ Scene::Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLF
     m_scene_list.back().ibl_request = true;
 #endif
 
-#if 1
+#if 0
     m_scene_list.emplace_back(*m_device, *m_upload_command_list,
                               ASSETS_PATH "model/Mannequin_Animation/source/Mannequin_Animation.FBX");
     m_scene_list.back().matrix = glm::scale(glm::vec3(0.07f)) * glm::translate(glm::vec3(75.0f, 0.0f, 0.0f)) *
@@ -157,7 +157,7 @@ Scene::Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLF
     m_camera.SetCameraYaw(-1.75f);
     m_camera.SetViewport(m_width, m_height);
 
-    for (uint32_t i = 0; i < settings.frame_count * m_passes.size(); ++i) {
+    for (uint32_t i = 0; i < kFrameCount * m_passes.size(); ++i) {
         m_command_lists.emplace_back(m_device->CreateRenderCommandList());
     }
 
