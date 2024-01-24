@@ -95,25 +95,21 @@ set(lib_shaders
     ${shaders_path}/RayTracingAO.hlsl
 )
 
-set_property(SOURCE ${pixel_shaders} PROPERTY VS_SHADER_ENTRYPOINT main)
-set_property(SOURCE ${pixel_shaders} PROPERTY VS_SHADER_TYPE Pixel)
-set_property(SOURCE ${pixel_shaders} PROPERTY VS_SHADER_MODEL 6.0)
-set_property(SOURCE ${pixel_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
+set_property(SOURCE ${pixel_shaders} PROPERTY SHADER_ENTRYPOINT main)
+set_property(SOURCE ${pixel_shaders} PROPERTY SHADER_TYPE Pixel)
+set_property(SOURCE ${pixel_shaders} PROPERTY SHADER_MODEL 6.0)
 
-set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_ENTRYPOINT main)
-set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_TYPE Vertex)
-set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_MODEL 6.0)
-set_property(SOURCE ${vertex_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
+set_property(SOURCE ${vertex_shaders} PROPERTY SHADER_ENTRYPOINT main)
+set_property(SOURCE ${vertex_shaders} PROPERTY SHADER_TYPE Vertex)
+set_property(SOURCE ${vertex_shaders} PROPERTY SHADER_MODEL 6.0)
 
-set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_ENTRYPOINT main)
-set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_TYPE Compute)
-set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_MODEL 6.0)
-set_property(SOURCE ${compute_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
+set_property(SOURCE ${compute_shaders} PROPERTY SHADER_ENTRYPOINT main)
+set_property(SOURCE ${compute_shaders} PROPERTY SHADER_TYPE Compute)
+set_property(SOURCE ${compute_shaders} PROPERTY SHADER_MODEL 6.0)
 
-set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_ENTRYPOINT " ")
-set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_TYPE Library)
-set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_MODEL 6.3)
-set_property(SOURCE ${lib_shaders} PROPERTY VS_SHADER_FLAGS "/Zi /auto-binding-space 0")
+set_property(SOURCE ${lib_shaders} PROPERTY SHADER_ENTRYPOINT " ")
+set_property(SOURCE ${lib_shaders} PROPERTY SHADER_TYPE Library)
+set_property(SOURCE ${lib_shaders} PROPERTY SHADER_MODEL 6.3)
 
 set(shaders_files ${pixel_shaders} ${vertex_shaders} ${compute_shaders} ${lib_shaders})
 
