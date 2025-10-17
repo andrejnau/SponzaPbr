@@ -8,3 +8,9 @@ if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-DNOMINMAX)
 endif()
+
+if (APPLE)
+    add_compile_options(
+        -Wno-missing-template-arg-list-after-template-kw
+    )
+endif()
