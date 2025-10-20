@@ -1,16 +1,24 @@
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
 
-if (MSVC)
-    add_compile_options("/MP")
-    add_definitions(-DUNICODE -D_UNICODE)
-    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-    add_definitions(-DNOMINMAX)
-endif()
+set(appleclang_compile_options
+    -Wno-missing-template-arg-list-after-template-kw
+)
+set(msvc_compile_options
+    /MP
+)
+add_compile_options(
+    "$<$<COMPILE_LANG_AND_ID:CXX,AppleClang>:${appleclang_compile_options}>"
+    "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:${msvc_compile_options}>"
+)
 
-if (APPLE)
-    add_compile_options(
-        -Wno-missing-template-arg-list-after-template-kw
-    )
-endif()
+set(msvc_compile_definitions
+    _UNICODE
+    NOMINMAX
+    UNICODE
+)
+add_compile_definitions(
+    "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:${msvc_compile_definitions}>"
+)
