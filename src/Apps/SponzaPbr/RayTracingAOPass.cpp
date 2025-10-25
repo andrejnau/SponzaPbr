@@ -90,7 +90,7 @@ void RayTracingAOPass::OnRender(RenderCommandList& command_list)
                     continue;
                 }
 
-                BufferDesc vertex = {
+                RaytracingGeometryBufferDesc vertex = {
                     model.ia.positions.IsDynamic() ? model.ia.positions.GetDynamicBuffer()
                                                    : model.ia.positions.GetBuffer(),
                     gli::format::FORMAT_RGB32_SFLOAT_PACK32,
@@ -98,7 +98,7 @@ void RayTracingAOPass::OnRender(RenderCommandList& command_list)
                     (uint32_t)range.base_vertex_location,
                 };
 
-                BufferDesc index = {
+                RaytracingGeometryBufferDesc index = {
                     model.ia.indices.GetBuffer(),
                     model.ia.indices.Format(),
                     range.index_count,
