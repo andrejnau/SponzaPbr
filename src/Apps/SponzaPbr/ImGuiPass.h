@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AppBox/AppBox.h"
 #include "Device/Device.h"
 #include "Geometry/Geometry.h"
 #include "ImGuiSettings.h"
@@ -25,7 +26,7 @@ public:
               const Input& input,
               int width,
               int height,
-              GLFWwindow* window);
+              const CursorMode& cursor_mode);
     ~ImGuiPass();
 
     virtual void OnUpdate() override;
@@ -33,7 +34,7 @@ public:
     virtual void OnResize(int width, int height) override;
 
     virtual void OnKey(int key, int action) override;
-    virtual void OnMouse(bool first, double xpos, double ypos) override;
+    virtual void OnMouse(double xpos, double ypos) override;
     virtual void OnMouseButton(int button, int action) override;
     virtual void OnScroll(double xoffset, double yoffset) override;
     virtual void OnInputChar(unsigned int ch) override;
@@ -46,7 +47,7 @@ private:
     Input m_input;
     int m_width;
     int m_height;
-    GLFWwindow* m_window;
+    const CursorMode& m_cursor_mode;
 
     std::shared_ptr<Resource> m_font_texture_view;
     ProgramHolder<ImGuiPass_PS, ImGuiPass_VS> m_program;

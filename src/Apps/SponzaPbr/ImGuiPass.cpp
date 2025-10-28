@@ -6,22 +6,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#if defined(_WIN32)
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <GLFW/glfw3native.h>
-#endif
-
 ImGuiPass::ImGuiPass(RenderDevice& device,
                      RenderCommandList& command_list,
                      const Input& input,
                      int width,
                      int height,
-                     GLFWwindow* window)
+                     const CursorMode& cursor_mode)
     : m_device(device)
     , m_input(input)
     , m_width(width)
     , m_height(height)
-    , m_window(window)
+    , m_cursor_mode(cursor_mode)
     , m_program(device)
     , m_imgui_settings(m_input.root_scene, m_input.settings)
 {
@@ -54,7 +49,7 @@ void ImGuiPass::OnUpdate() {}
 
 void ImGuiPass::OnRender(RenderCommandList& command_list)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) != GLFW_CURSOR_NORMAL) {
+    if (m_cursor_mode != CursorMode::kNormal) {
         return;
     }
 
@@ -142,7 +137,7 @@ void ImGuiPass::OnResize(int width, int height)
 
 void ImGuiPass::OnKey(int key, int action)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
+    if (m_cursor_mode == CursorMode::kNormal) {
         ImGuiIO& io = ImGui::GetIO();
         if (action == GLFW_PRESS) {
             io.KeysDown[key] = true;
@@ -159,7 +154,7 @@ void ImGuiPass::OnKey(int key, int action)
     m_imgui_settings.OnKey(key, action);
 }
 
-void ImGuiPass::OnMouse(bool first, double xpos, double ypos)
+void ImGuiPass::OnMouse(double xpos, double ypos)
 {
     ImGuiIO& io = ImGui::GetIO();
 #if defined(__APPLE__)

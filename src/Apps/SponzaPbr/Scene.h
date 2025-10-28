@@ -1,4 +1,5 @@
 #pragma once
+#include "AppBox/AppBox.h"
 #include "BRDFGen.h"
 #include "BackgroundPass.h"
 #include "Camera/Camera.h"
@@ -29,7 +30,7 @@
 
 class Scene : public InputEvents, public WindowEvents, public IModifySponzaSettings {
 public:
-    Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLFWwindow* window, int width, int height);
+    Scene(AppBox& app, const Settings& settings, std::shared_ptr<RenderDevice> device);
     ~Scene();
 
     RenderDevice& GetRenderDevice()
@@ -42,7 +43,7 @@ public:
     void OnResize(int width, int height) override;
 
     virtual void OnKey(int key, int action) override;
-    virtual void OnMouse(bool first, double xpos, double ypos) override;
+    virtual void OnMouse(double xpos, double ypos) override;
     virtual void OnMouseButton(int button, int action) override;
     virtual void OnScroll(double xoffset, double yoffset) override;
     virtual void OnInputChar(unsigned int ch) override;
@@ -51,11 +52,13 @@ public:
 private:
     void CreateRT();
 
+    AppBox& m_app;
     std::shared_ptr<RenderDevice> m_device;
-    GLFWwindow* m_window;
-
     int m_width;
     int m_height;
+    CursorMode m_cursor_mode = CursorMode::kHidden;
+    bool m_lock_focus = false;
+
     std::shared_ptr<RenderCommandList> m_upload_command_list;
     std::shared_ptr<Resource> m_render_target_view;
     std::shared_ptr<Resource> m_depth_stencil_view;

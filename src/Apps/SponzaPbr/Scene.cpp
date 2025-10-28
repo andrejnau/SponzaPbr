@@ -2,27 +2,26 @@
 
 #include "Utilities/SystemUtils.h"
 
-#include <GLFW/glfw3.h>
 #include <glm/gtx/transform.hpp>
 
 #include <chrono>
 
-Scene::Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLFWwindow* window, int width, int height)
-    : m_device(device)
-    , m_window(window)
-    , m_width(width)
-    , m_height(height)
+Scene::Scene(AppBox& app, const Settings& settings, std::shared_ptr<RenderDevice> device)
+    : m_app(app)
+    , m_device(device)
+    , m_width(m_app.GetAppSize().width())
+    , m_height(m_app.GetAppSize().height())
     , m_upload_command_list(m_device->CreateRenderCommandList())
     , m_model_square(*m_device, *m_upload_command_list, ASSETS_PATH "model/square.obj")
     , m_model_cube(*m_device, *m_upload_command_list, ASSETS_PATH "model/cube.obj", ~aiProcess_FlipWindingOrder)
     , m_skinning_pass(*m_device, { m_scene_list })
-    , m_geometry_pass(*m_device, { m_scene_list, m_camera }, width, height)
+    , m_geometry_pass(*m_device, { m_scene_list, m_camera }, m_width, m_height)
     , m_shadow_pass(*m_device, { m_scene_list, m_camera, m_light_pos })
     , m_ssao_pass(*m_device,
                   *m_upload_command_list,
                   { m_geometry_pass.output, m_model_square, m_camera },
-                  width,
-                  height)
+                  m_width,
+                  m_height)
     , m_brdf(*m_device, { m_model_square })
     , m_equirectangular2cubemap(*m_device, { m_model_cube, m_equirectangular_environment })
     , m_ibl_compute(*m_device,
@@ -31,24 +30,28 @@ Scene::Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLF
     , m_background_pass(*m_device,
                         { m_model_cube, m_camera, m_equirectangular2cubemap.output.environment,
                           m_geometry_pass.output.albedo, m_geometry_pass.output.dsv },
-                        width,
-                        height)
+                        m_width,
+                        m_height)
     , m_light_pass(*m_device,
                    { m_geometry_pass.output, m_shadow_pass.output, m_ssao_pass.output, m_rtao, m_model_square, m_camera,
                      m_light_pos, m_irradince, m_prefilter, m_brdf.output.brdf },
-                   width,
-                   height)
+                   m_width,
+                   m_height)
     , m_compute_luminance(*m_device,
                           { m_light_pass.output.rtv, m_model_square, m_render_target_view, m_depth_stencil_view },
-                          width,
-                          height)
+                          m_width,
+                          m_height)
     , m_imgui_pass(*m_device,
                    *m_upload_command_list,
                    { m_render_target_view, *this, m_settings },
-                   width,
-                   height,
-                   window)
+                   m_width,
+                   m_height,
+                   m_cursor_mode)
 {
+    m_app.SetCursorMode(m_cursor_mode);
+    app.SubscribeEvents(this, this);
+    app.SetGpuName(m_device->GetGpuName());
+
 #if !defined(_DEBUG) && 1
     m_scene_list.emplace_back(*m_device, *m_upload_command_list, ASSETS_PATH "model/sponza_pbr/sponza.obj");
     m_scene_list.back().matrix = glm::scale(glm::vec3(0.01f));
@@ -127,9 +130,9 @@ Scene::Scene(const Settings& settings, std::shared_ptr<RenderDevice> device, GLF
 
     if (m_device->IsDxrSupported()) {
         m_settings.Set("use_rtao", true);
-        m_ray_tracing_ao_pass.reset(
-            new RayTracingAOPass(*m_device, *m_upload_command_list,
-                                 { m_geometry_pass.output, m_scene_list, m_model_square, m_camera }, width, height));
+        m_ray_tracing_ao_pass.reset(new RayTracingAOPass(
+            *m_device, *m_upload_command_list, { m_geometry_pass.output, m_scene_list, m_model_square, m_camera },
+            m_width, m_height));
         m_rtao = &m_ray_tracing_ao_pass->output.ao;
     }
 
@@ -243,8 +246,26 @@ void Scene::OnResize(int width, int height)
 
 void Scene::OnKey(int key, int action)
 {
+    if (key == GLFW_KEY_L && action == GLFW_PRESS) {
+        m_lock_focus = !m_lock_focus;
+        if (m_cursor_mode != CursorMode::kNormal) {
+            m_cursor_mode = m_lock_focus ? CursorMode::kDisabled : CursorMode::kHidden;
+            m_app.SetCursorMode(m_cursor_mode);
+        }
+    }
+
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS) {
+        if (m_cursor_mode != CursorMode::kNormal) {
+            m_cursor_mode = CursorMode::kNormal;
+        } else {
+            m_cursor_mode = m_lock_focus ? CursorMode::kDisabled : CursorMode::kHidden;
+        }
+        m_app.SetCursorMode(m_cursor_mode);
+    }
+
     m_imgui_pass.OnKey(key, action);
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
+
+    if (m_cursor_mode == CursorMode::kNormal) {
         return;
     }
 
@@ -255,10 +276,19 @@ void Scene::OnKey(int key, int action)
     }
 }
 
-void Scene::OnMouse(bool first_event, double xpos, double ypos)
+void Scene::OnMouse(double xpos, double ypos)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
-        m_imgui_pass.OnMouse(first_event, xpos, ypos);
+    static bool first_event = true;
+    bool next_first_event = first_event;
+    if (m_cursor_mode != CursorMode::kNormal) {
+        next_first_event = false;
+    } else {
+        next_first_event = true;
+    }
+
+    if (m_cursor_mode == CursorMode::kNormal) {
+        m_imgui_pass.OnMouse(xpos, ypos);
+        first_event = next_first_event;
         return;
     }
 
@@ -274,25 +304,26 @@ void Scene::OnMouse(bool first_event, double xpos, double ypos)
     m_last_y = ypos;
 
     m_camera.ProcessMouseMovement((float)xoffset, (float)yoffset);
+    first_event = next_first_event;
 }
 
 void Scene::OnMouseButton(int button, int action)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
+    if (m_cursor_mode == CursorMode::kNormal) {
         m_imgui_pass.OnMouseButton(button, action);
     }
 }
 
 void Scene::OnScroll(double xoffset, double yoffset)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
+    if (m_cursor_mode == CursorMode::kNormal) {
         m_imgui_pass.OnScroll(xoffset, yoffset);
     }
 }
 
 void Scene::OnInputChar(unsigned int ch)
 {
-    if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_NORMAL) {
+    if (m_cursor_mode == CursorMode::kNormal) {
         m_imgui_pass.OnInputChar(ch);
     }
 }
