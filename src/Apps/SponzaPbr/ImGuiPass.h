@@ -26,7 +26,7 @@ public:
               const Input& input,
               int width,
               int height,
-              const CursorMode& cursor_mode);
+              const AppBox& m_app);
     ~ImGuiPass();
 
     virtual void OnUpdate() override;
@@ -47,7 +47,7 @@ private:
     Input m_input;
     int m_width;
     int m_height;
-    const CursorMode& m_cursor_mode;
+    const AppBox& m_app;
 
     std::shared_ptr<Resource> m_font_texture_view;
     ProgramHolder<ImGuiPass_PS, ImGuiPass_VS> m_program;

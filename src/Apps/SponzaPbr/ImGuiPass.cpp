@@ -6,17 +6,22 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#if defined(_WIN32)
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <GLFW/glfw3native.h>
+#endif
+
 ImGuiPass::ImGuiPass(RenderDevice& device,
                      RenderCommandList& command_list,
                      const Input& input,
                      int width,
                      int height,
-                     const CursorMode& cursor_mode)
+                     const AppBox& app)
     : m_device(device)
     , m_input(input)
     , m_width(width)
     , m_height(height)
-    , m_cursor_mode(cursor_mode)
+    , m_app(app)
     , m_program(device)
     , m_imgui_settings(m_input.root_scene, m_input.settings)
 {
@@ -24,7 +29,7 @@ ImGuiPass::ImGuiPass(RenderDevice& device,
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2((float)m_width, (float)m_height);
 #if defined(_WIN32)
-    UINT dpi = GetDpiForWindow(glfwGetWin32Window(window));
+    UINT dpi = GetDpiForWindow(glfwGetWin32Window(app.GetWindow()));
     io.FontGlobalScale = dpi / 96.0f;
 #else
     io.FontGlobalScale = 2.0f;
@@ -49,7 +54,7 @@ void ImGuiPass::OnUpdate() {}
 
 void ImGuiPass::OnRender(RenderCommandList& command_list)
 {
-    if (m_cursor_mode != CursorMode::kNormal) {
+    if (m_app.GetCursorMode() != CursorMode::kNormal) {
         return;
     }
 
@@ -137,7 +142,7 @@ void ImGuiPass::OnResize(int width, int height)
 
 void ImGuiPass::OnKey(int key, int action)
 {
-    if (m_cursor_mode == CursorMode::kNormal) {
+    if (m_app.GetCursorMode() == CursorMode::kNormal) {
         ImGuiIO& io = ImGui::GetIO();
         if (action == GLFW_PRESS) {
             io.KeysDown[key] = true;

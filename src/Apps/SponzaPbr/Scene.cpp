@@ -46,7 +46,7 @@ Scene::Scene(AppBox& app, const Settings& settings, std::shared_ptr<RenderDevice
                    { m_render_target_view, *this, m_settings },
                    m_width,
                    m_height,
-                   m_cursor_mode)
+                   m_app)
 {
     m_app.SetCursorMode(m_cursor_mode);
     app.SubscribeEvents(this, this);
