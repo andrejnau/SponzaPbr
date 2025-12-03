@@ -338,8 +338,10 @@ void IBLCompute::DrawDownSample(RenderCommandList& command_list, Model& ibl_mode
 {
     command_list.UseProgram(m_program_downsample);
     for (size_t i = 1; i < texture_mips; ++i) {
-        command_list.Attach(m_program_downsample.cs.srv.inputTexture, ibl_model.ibl_rtv, { i - 1, 1 });
-        command_list.Attach(m_program_downsample.cs.uav.outputTexture, ibl_model.ibl_rtv, { i, 1 });
+        command_list.Attach(m_program_downsample.cs.srv.inputTexture, ibl_model.ibl_rtv,
+                            { static_cast<uint32_t>(i) - 1, 1 });
+        command_list.Attach(m_program_downsample.cs.uav.outputTexture, ibl_model.ibl_rtv,
+                            { static_cast<uint32_t>(i), 1 });
         command_list.Dispatch((m_size >> i) / 8, (m_size >> i) / 8, 6);
     }
 }

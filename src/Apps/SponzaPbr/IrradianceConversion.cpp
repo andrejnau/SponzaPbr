@@ -127,9 +127,9 @@ void IrradianceConversion::DrawPrefilter(RenderCommandList& command_list)
         RenderPassBeginDesc render_pass_desc = {};
         render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].texture = m_input.prefilter.res;
         render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].load_op = RenderPassLoadOp::kLoad;
-        render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].view_desc = { mip, 1 };
+        render_pass_desc.colors[m_program_prefilter.ps.om.rtv0].view_desc = { static_cast<uint32_t>(mip), 1 };
         render_pass_desc.depth_stencil.texture = m_input.prefilter.dsv;
-        render_pass_desc.depth_stencil.view_desc = { mip, 1 };
+        render_pass_desc.depth_stencil.view_desc = { static_cast<uint32_t>(mip), 1 };
         render_pass_desc.depth_stencil.clear_depth = 1.0f;
 
         command_list.BeginRenderPass(render_pass_desc);
