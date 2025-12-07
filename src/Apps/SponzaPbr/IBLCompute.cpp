@@ -12,15 +12,19 @@ IBLCompute::IBLCompute(RenderDevice& device, const Input& input)
     , m_program_downsample(device)
 {
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 
     m_compare_sampler = m_device.CreateSampler({
-        SamplerFilter::kComparisonMinMagMipLinear,
-        SamplerTextureAddressMode::kClamp,
-        SamplerComparisonFunc::kLess,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
+        .address_mode_u = SamplerAddressMode::kClampToEdge,
+        .address_mode_v = SamplerAddressMode::kClampToEdge,
+        .address_mode_w = SamplerAddressMode::kClampToEdge,
+        .compare_enable = true,
     });
 }
 
@@ -223,7 +227,7 @@ void IBLCompute::Draw(RenderCommandList& command_list, Model& ibl_model)
     if (m_use_pre_pass) {
         render_pass_desc.depth_stencil.texture = ibl_model.ibl_dsv;
         render_pass_desc.depth_stencil.depth_load_op = RenderPassLoadOp::kLoad;
-        command_list.SetDepthStencilState({ true, ComparisonFunc::kLessEqual });
+        command_list.SetDepthStencilState({ .depth_test_enable = true, .depth_func = ComparisonFunc::kLessEqual });
     } else {
         render_pass_desc.depth_stencil.texture = ibl_model.ibl_dsv;
         render_pass_desc.depth_stencil.clear_depth = 1.0f;
@@ -287,7 +291,7 @@ void IBLCompute::DrawBackgroud(RenderCommandList& command_list, Model& ibl_model
     command_list.UseProgram(m_program_backgroud);
     command_list.Attach(m_program_backgroud.vs.cbv.ConstantBuf, m_program_backgroud.vs.cbuffer.ConstantBuf);
 
-    command_list.SetDepthStencilState({ true, ComparisonFunc::kLessEqual });
+    command_list.SetDepthStencilState({ .depth_test_enable = true, .depth_func = ComparisonFunc::kLessEqual });
 
     command_list.Attach(m_program_backgroud.ps.sampler.g_sampler, m_sampler);
 

@@ -12,9 +12,9 @@ Equirectangular2Cubemap::Equirectangular2Cubemap(RenderDevice& device, const Inp
     CreateSizeDependentResources();
 
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 }
 

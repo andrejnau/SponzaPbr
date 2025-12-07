@@ -22,9 +22,9 @@ SSAOPass::SSAOPass(RenderDevice& device, RenderCommandList& command_list, const 
     , m_program_blur(device)
 {
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
     CreateSizeDependentResources();
 

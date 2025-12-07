@@ -11,9 +11,9 @@ BackgroundPass::BackgroundPass(RenderDevice& device, const Input& input, int wid
     , m_program(device)
 {
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 }
 
@@ -31,7 +31,7 @@ void BackgroundPass::OnRender(RenderCommandList& command_list)
     command_list.UseProgram(m_program);
     command_list.Attach(m_program.vs.cbv.ConstantBuf, m_program.vs.cbuffer.ConstantBuf);
 
-    command_list.SetDepthStencilState({ true, ComparisonFunc::kLessEqual });
+    command_list.SetDepthStencilState({ .depth_test_enable = true, .depth_func = ComparisonFunc::kLessEqual });
 
     command_list.Attach(m_program.ps.sampler.g_sampler, m_sampler);
 

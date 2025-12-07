@@ -18,9 +18,9 @@ RayTracingAOPass::RayTracingAOPass(RenderDevice& device,
 {
     CreateSizeDependentResources();
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 
     std::vector<glm::uvec4> data;

@@ -10,8 +10,13 @@ GeometryPass::GeometryPass(RenderDevice& device, const Input& input, int width, 
     , m_program(device)
 {
     CreateSizeDependentResources();
-    m_sampler = m_device.CreateSampler(
-        { SamplerFilter::kAnisotropic, SamplerTextureAddressMode::kWrap, SamplerComparisonFunc::kNever });
+    m_sampler = m_device.CreateSampler({
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
+        .anisotropy_enable = true,
+        .max_anisotropy = 16,
+    });
 }
 
 void GeometryPass::OnUpdate()

@@ -10,9 +10,9 @@ ShadowPass::ShadowPass(RenderDevice& device, const Input& input)
 {
     CreateSizeDependentResources();
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 }
 
@@ -61,8 +61,8 @@ void ShadowPass::OnRender(RenderCommandList& command_list)
     command_list.BeginRenderPass(render_pass_desc);
     for (auto& model : m_input.scene_list) {
         m_program.vs.cbuffer.VSParams.World = glm::transpose(model.matrix);
-
-        command_list.SetRasterizeState({ FillMode::kSolid, CullMode::kBack, 4096 });
+        command_list.SetRasterizeState(
+            { .fill_mode = FillMode::kSolid, .cull_mode = CullMode::kBack, .depth_bias = 4096 });
 
         model.ia.indices.Bind(command_list);
         model.ia.positions.BindToSlot(command_list, m_program.vs.ia.SV_POSITION);

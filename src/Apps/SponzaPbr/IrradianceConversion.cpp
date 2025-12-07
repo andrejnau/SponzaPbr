@@ -10,9 +10,9 @@ IrradianceConversion::IrradianceConversion(RenderDevice& device, const Input& in
     , m_program_prefilter(device)
 {
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 }
 

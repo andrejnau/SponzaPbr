@@ -12,21 +12,28 @@ LightPass::LightPass(RenderDevice& device, const Input& input, int width, int he
 {
     CreateSizeDependentResources();
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kAnisotropic,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
     });
 
     m_sampler_brdf = m_device.CreateSampler({
-        SamplerFilter::kMinMagMipLinear,
-        SamplerTextureAddressMode::kClamp,
-        SamplerComparisonFunc::kNever,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
+        .address_mode_u = SamplerAddressMode::kClampToEdge,
+        .address_mode_v = SamplerAddressMode::kClampToEdge,
+        .address_mode_w = SamplerAddressMode::kClampToEdge,
     });
 
     m_compare_sampler = m_device.CreateSampler({
-        SamplerFilter::kComparisonMinMagMipLinear,
-        SamplerTextureAddressMode::kClamp,
-        SamplerComparisonFunc::kLess,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kLinear,
+        .address_mode_u = SamplerAddressMode::kClampToEdge,
+        .address_mode_v = SamplerAddressMode::kClampToEdge,
+        .address_mode_w = SamplerAddressMode::kClampToEdge,
+        .compare_enable = true,
     });
 }
 

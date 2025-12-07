@@ -39,9 +39,9 @@ ImGuiPass::ImGuiPass(RenderDevice& device,
     InitKey();
     CreateFontsTexture(command_list);
     m_sampler = m_device.CreateSampler({
-        SamplerFilter::kMinMagMipLinear,
-        SamplerTextureAddressMode::kWrap,
-        SamplerComparisonFunc::kAlways,
+        .min_filter = SamplerFilter::kLinear,
+        .mag_filter = SamplerFilter::kLinear,
+        .mip_filter = SamplerFilter::kNearest,
     });
 }
 
@@ -107,11 +107,11 @@ void ImGuiPass::OnRender(RenderCommandList& command_list)
 
     command_list.Attach(m_program.ps.sampler.sampler0, m_sampler);
 
-    command_list.SetBlendState({ true, Blend::kSrcAlpha, Blend::kInvSrcAlpha, BlendOp::kAdd, Blend::kInvSrcAlpha,
-                                 Blend::kZero, BlendOp::kAdd });
+    command_list.SetBlendState({ true, BlendFactor::kSrcAlpha, BlendFactor::kOneMinusSrcAlpha, BlendOp::kAdd,
+                                 BlendFactor::kOneMinusSrcAlpha, BlendFactor::kZero, BlendOp::kAdd });
 
     command_list.SetRasterizeState({ FillMode::kSolid, CullMode::kNone });
-    command_list.SetDepthStencilState({ false, ComparisonFunc::kLessEqual });
+    command_list.SetDepthStencilState({ .depth_test_enable = false, .depth_func = ComparisonFunc::kLessEqual });
     command_list.SetViewport(0, 0, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
 
     int vtx_offset = 0;
