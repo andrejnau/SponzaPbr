@@ -1,3 +1,5 @@
+#pragma dxc diagnostic ignored "-Wconversion"
+
 #include "BoneTransform.hlsli"
 
 StructuredBuffer<float3> in_position;

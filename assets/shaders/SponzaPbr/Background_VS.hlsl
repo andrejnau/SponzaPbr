@@ -1,3 +1,5 @@
+#pragma dxc diagnostic ignored "-Wconversion"
+
 struct VS_INPUT
 {
     float3 pos : POSITION;

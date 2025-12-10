@@ -1,3 +1,5 @@
+#pragma dxc diagnostic ignored "-Wconversion"
+
 #include "BoneTransform.hlsli"
 
 struct VS_INPUT

@@ -24,7 +24,7 @@ float nextRand(inout uint s)
     return float(s & 0x00FFFFFF) / float(0x01000000);
 }
 
-// Utility function to get a vector perpendicular to an input vector 
+// Utility function to get a vector perpendicular to an input vector
 //    (from "Efficient Construction of Perpendicular Vectors Without Branching")
 float3 getPerpendicularVector(float3 u)
 {
@@ -139,7 +139,7 @@ void RayGen()
 [shader("miss")]
 void Miss(inout RayPayload rayData)
 {
-    rayData.value = float3(1, 0, 0);
+    rayData.value = 1;
 }
 
 float2 BarycentricLerp(in float2 v0, in float2 v1, in float2 v2, in float3 barycentrics)
