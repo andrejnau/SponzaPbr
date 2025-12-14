@@ -40,7 +40,7 @@ public:
 
     void RenderFrame();
 
-    void OnResize(int width, int height) override;
+    void OnResize(uint32_t width, uint32_t height) override;
 
     virtual void OnKey(int key, int action) override;
     virtual void OnMouse(double xpos, double ypos) override;

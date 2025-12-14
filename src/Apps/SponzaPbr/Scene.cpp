@@ -9,8 +9,8 @@
 Scene::Scene(AppBox& app, const Settings& settings, std::shared_ptr<RenderDevice> device)
     : m_app(app)
     , m_device(device)
-    , m_width(m_app.GetAppSize().width())
-    , m_height(m_app.GetAppSize().height())
+    , m_width(m_app.GetAppSize().width)
+    , m_height(m_app.GetAppSize().height)
     , m_upload_command_list(m_device->CreateRenderCommandList())
     , m_model_square(*m_device, *m_upload_command_list, ASSETS_PATH "model/square.obj")
     , m_model_cube(*m_device, *m_upload_command_list, ASSETS_PATH "model/cube.obj", ~aiProcess_FlipWindingOrder)
@@ -218,7 +218,7 @@ void Scene::RenderFrame()
     m_device->Present();
 }
 
-void Scene::OnResize(int width, int height)
+void Scene::OnResize(uint32_t width, uint32_t height)
 {
     if (width == m_width && height == m_height) {
         return;
